@@ -528,30 +528,61 @@ class DatasetValidator:
         }
         emp_map = {e.employee_id: e for e in self.dataset.employees}
 
-        # 1. Detect Double Bookings
-        emp_date_shifts: Dict[Tuple[str, str], List[ShiftAssignment]] = {}
-        for sa in self.dataset.shift_assignments:
-            if sa.status in (AssignmentStatus.SCHEDULED, AssignmentStatus.COMPLETED):
-                key = (sa.employee_id, sa.date)
-                if key not in emp_date_shifts:
-                    emp_date_shifts[key] = []
-                emp_date_shifts[key].append(sa)
+        # 1. Detect actual shift overlaps using scheduled timestamps.
+        # Calendar dates are insufficient: shifts can cross midnight, and two
+        # shifts on the same date may be perfectly valid if their intervals do
+        # not intersect. Intervals are half-open [start, end), so a shift ending
+        # exactly when another starts is not considered an overlap.
+        active_assignments = [
+            sa for sa in self.dataset.shift_assignments
+            if sa.status in (AssignmentStatus.SCHEDULED, AssignmentStatus.COMPLETED)
+        ]
+        assignments_by_employee: Dict[str, List[Tuple[datetime.datetime, datetime.datetime, ShiftAssignment]]] = {}
 
-        for (emp_id, date), shifts in emp_date_shifts.items():
-            if len(shifts) > 1:
-                # Double-booked!
-                primary_id = shifts[0].assignment_id
-                sec_id = shifts[1].assignment_id
-                self.detected_anomalies.append(
-                    ValidationIssue(
-                        check_name="DOUBLE_BOOKING_DETECTION",
-                        severity="ANOMALY_DETECTED",
-                        entity_type="ShiftAssignment",
-                        entity_id=primary_id,
-                        message=f"Employee {emp_id} double-booked with {len(shifts)} shifts on {date} ({primary_id}, {sec_id})",
-                        rule_code="RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
-                    )
-                )
+        for sa in active_assignments:
+            try:
+                start = datetime.datetime.fromisoformat(sa.scheduled_start.replace("Z", "+00:00"))
+                end = datetime.datetime.fromisoformat(sa.scheduled_end.replace("Z", "+00:00"))
+            except (AttributeError, TypeError, ValueError):
+                # Timestamp format/order validation reports malformed intervals.
+                continue
+
+            # Treat naive timestamps consistently as UTC if legacy data omits
+            # a timezone; do not mix naive and aware datetimes in comparisons.
+            if start.tzinfo is None:
+                start = start.replace(tzinfo=datetime.timezone.utc)
+            if end.tzinfo is None:
+                end = end.replace(tzinfo=datetime.timezone.utc)
+            if start >= end:
+                continue
+
+            assignments_by_employee.setdefault(sa.employee_id, []).append((start, end, sa))
+
+        for emp_id, intervals in assignments_by_employee.items():
+            intervals.sort(key=lambda item: (item[0], item[1], item[2].assignment_id))
+            for index, (start_a, end_a, assignment_a) in enumerate(intervals):
+                for start_b, end_b, assignment_b in intervals[index + 1:]:
+                    # Sorted by start time, so later intervals cannot overlap
+                    # assignment_a once their start is at/after its end.
+                    if start_b >= end_a:
+                        break
+                    if start_a < end_b and start_b < end_a:
+                        self.detected_anomalies.append(
+                            ValidationIssue(
+                                check_name="DOUBLE_BOOKING_DETECTION",
+                                severity="ANOMALY_DETECTED",
+                                entity_type="ShiftAssignment",
+                                entity_id=assignment_a.assignment_id,
+                                message=(
+                                    f"Employee {emp_id} has overlapping shifts "
+                                    f"{assignment_a.assignment_id} "
+                                    f"({assignment_a.scheduled_start} to {assignment_a.scheduled_end}) "
+                                    f"and {assignment_b.assignment_id} "
+                                    f"({assignment_b.scheduled_start} to {assignment_b.scheduled_end})"
+                                ),
+                                rule_code="RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
+                            )
+                        )
 
         # 2. Detect Approved Leave Overlapping Shift
         approved_leaves = [l for l in self.dataset.leave_requests if l.status == LeaveStatus.APPROVED]
