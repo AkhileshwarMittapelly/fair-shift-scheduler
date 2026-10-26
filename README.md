@@ -1,11 +1,11 @@
 # Fair Shift Scheduler 🗓️⚖️
 *Autonomous Workforce Optimization, Labor Law Compliance & Fair Roster Generation System*
 
-[![Tests](https://img.shields.io/badge/tests-7%20passed-brightgreen.svg)]()
+[![CI](https://github.com/AkhileshwarMittapelly/fair-shift-scheduler/actions/workflows/ci.yml/badge.svg)](https://github.com/AkhileshwarMittapelly/fair-shift-scheduler/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 [![Reproducibility](https://img.shields.io/badge/Step%2010%20Reproducibility-100%25%20Bit--for--Bit-brightgreen.svg)]()
-[![F1-Score](https://img.shields.io/badge/Anomaly%20F1--Score-1.0%20(100%25)-brightgreen.svg)]()
+[![Anomaly Benchmark](https://img.shields.io/badge/anomaly%20benchmark-reports%20generated-blue.svg)]()
 [![YottaFlex AI](https://img.shields.io/badge/YottaFlex%20AI-Submission%20Compliant-purple.svg)]()
 
 ---
@@ -32,7 +32,7 @@ In 24/7 mission-critical operations (healthcare emergency departments, ICU wards
 - **Workforce Equity & Fairness**: Preventing antisocial shift clustering (balancing weekend and night shifts evenly across qualified staff, measured via the **Gini coefficient**).
 - **Auditability & Traceability**: Preserving immutable historical events for shift swaps, manager authorizations, and attendance punches.
 
-This solution provides a complete, mathematically grounded, reproducible end-to-end system that generates baseline master data, schedules fair rosters, detects edge-case anomalies with 100% precision/recall, and exposes an interactive multi-persona web application.
+This solution provides a complete, mathematically grounded, reproducible end-to-end system that generates baseline master data, schedules fair rosters, detects injected edge-case anomalies and reports precision, recall, and F1 from the generated benchmark, and exposes an interactive multi-persona web application.
 
 ---
 
@@ -81,15 +81,15 @@ graph TD
 
 ## 4. The 5 Injected Edge Cases & Ground Truth Detection
 
-The system deliberately injects 5 labelled edge cases into the dataset to test validator resilience. The 8-point validation engine detects every anomaly without accessing the ground truth file:
+The system deliberately injects 5 labelled edge cases into the dataset to test validator resilience. The validator checks these injected scenarios without using ground-truth labels as operational inputs. Benchmark scores are calculated from the generated report; incidental rule violations can affect precision, so do not assume perfect precision or F1 without verifying the current output:
 
 | Anomaly Type | Injected Scenario | Detection Rule | Precision | Recall | F1-Score |
 | :--- | :--- | :--- | :---: | :---: | :---: |
-| **`EMPLOYEE_DOUBLE_BOOKED`** | Employee assigned to overlapping morning and afternoon shifts on same date. | `RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS` | 100% | 100% | 1.0 |
-| **`APPROVED_LEAVE_OVERLAPS_SHIFT`** | Employee rostered on a date during an approved annual leave window. | `RULE_APPROVED_LEAVE_NON_CONFLICT` | 100% | 100% | 1.0 |
-| **`REQUIRED_SKILL_ABSENT`** | Shift requires specialized `SKILL-01`, but assigned employee lacks certified credential. | `RULE_MANDATORY_ROLE_SKILL_MATCH` | 100% | 100% | 1.0 |
-| **`OVERTIME_CAP_EXCEEDED`** | Employee scheduled for 3 additional night shifts, exceeding statutory weekly limit (>52.0h). | `RULE_MAX_WEEKLY_LABOR_AND_OVERTIME_CAP` | 100% | 100% | 1.0 |
-| **`SWAP_APPLIED_WITHOUT_APPROVAL`** | Shift swap marked `APPLIED` without manager decision/signature. | `RULE_SWAP_REQUIRES_MANAGER_APPROVAL` | 100% | 100% | 1.0 |
+| **`EMPLOYEE_DOUBLE_BOOKED`** | Employee assigned to overlapping morning and afternoon shifts on same date. | `RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS` | Measured in report | Measured in report | Measured in report |
+| **`APPROVED_LEAVE_OVERLAPS_SHIFT`** | Employee rostered on a date during an approved annual leave window. | `RULE_APPROVED_LEAVE_NON_CONFLICT` | Measured in report | Measured in report | Measured in report |
+| **`REQUIRED_SKILL_ABSENT`** | Shift requires specialized `SKILL-01`, but assigned employee lacks certified credential. | `RULE_MANDATORY_ROLE_SKILL_MATCH` | Measured in report | Measured in report | Measured in report |
+| **`OVERTIME_CAP_EXCEEDED`** | Employee scheduled for 3 additional night shifts, exceeding statutory weekly limit (>52.0h). | `RULE_MAX_WEEKLY_LABOR_AND_OVERTIME_CAP` | Measured in report | Measured in report | Measured in report |
+| **`SWAP_APPLIED_WITHOUT_APPROVAL`** | Shift swap marked `APPLIED` without manager decision/signature. | `RULE_SWAP_REQUIRES_MANAGER_APPROVAL` | Measured in report | Measured in report | Measured in report |
 
 ---
 
