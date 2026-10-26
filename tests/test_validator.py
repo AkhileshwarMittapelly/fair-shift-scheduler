@@ -10,7 +10,7 @@ import pytest
 from data_generator.generator import SyntheticDataGenerator
 from data_generator.validator import DatasetValidator, ValidationIssue
 from data_generator.models import (
-    ShiftAssignment, AssignmentStatus, GroundTruthAnomaly, AnomalyType
+    ShiftAssignment, AssignmentStatus, GroundTruthAnomaly, AnomalyType, LeaveStatus
 )
 
 
@@ -121,3 +121,24 @@ def test_incidental_violations_are_separated():
     assert "incidental_baseline_violations" in gt, (
         "ground_truth_evaluation must include 'incidental_baseline_violations' key"
     )
+
+
+
+def test_lifecycle_transition_failure_makes_dataset_invalid():
+    """
+    A pending leave with an authorizer is an invalid lifecycle state.
+    The overall validation result must fail, not merely report the issue.
+    """
+    gen = SyntheticDataGenerator(seed=20261022, scale="starter")
+    dataset = gen.generate()
+    assert dataset.leave_requests, "Starter dataset should include leave requests"
+
+    leave = dataset.leave_requests[0]
+    leave.status = LeaveStatus.PENDING
+    leave.decision_by = dataset.employees[0].employee_id
+
+    report = DatasetValidator(dataset).validate()
+
+    assert report.summary["lifecycle_transitions"] is False
+    assert report.structural_integrity["lifecycle_transitions"] is False
+    assert report.is_valid is False
