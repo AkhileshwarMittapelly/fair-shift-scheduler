@@ -111,7 +111,7 @@ class DatasetValidator:
         # Benchmark detected violations vs ground truth
         gt_eval = self._evaluate_ground_truth()
 
-        structural_valid = pk_ok and fk_ok and enum_ok and date_ok and arith_ok and dup_ok
+        structural_valid = pk_ok and fk_ok and enum_ok and date_ok and arith_ok and life_ok and dup_ok
 
         summary = {
             "pk_uniqueness": pk_ok,
@@ -135,6 +135,7 @@ class DatasetValidator:
             "allowed_enums": enum_ok,
             "date_ordering": date_ok,
             "arithmetic_reconciliation": arith_ok,
+            "lifecycle_transitions": life_ok,
             "duplicate_checks": dup_ok,
         }
 
