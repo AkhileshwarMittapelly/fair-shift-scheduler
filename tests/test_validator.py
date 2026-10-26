@@ -142,3 +142,119 @@ def test_lifecycle_transition_failure_makes_dataset_invalid():
     assert report.summary["lifecycle_transitions"] is False
     assert report.structural_integrity["lifecycle_transitions"] is False
     assert report.is_valid is False
+
+
+def _clear_active_assignments(dataset):
+    """Disable generated assignments so overlap tests only exercise crafted shifts."""
+    for assignment in dataset.shift_assignments:
+        assignment.status = AssignmentStatus.CANCELLED
+
+
+def test_double_booking_detects_overlapping_shifts_across_midnight():
+    from dataclasses import replace
+
+    dataset = SyntheticDataGenerator(seed=20261022, scale="starter").generate()
+    _clear_active_assignments(dataset)
+    template = dataset.shift_assignments[0]
+    first = replace(
+        template,
+        assignment_id="SHIFT-OVERLAP-NIGHT",
+        date="2026-01-01",
+        employee_id=dataset.employees[0].employee_id,
+        scheduled_start="2026-01-01T23:00:00+00:00",
+        scheduled_end="2026-01-02T07:30:00+00:00",
+        status=AssignmentStatus.SCHEDULED,
+    )
+    second = replace(
+        template,
+        assignment_id="SHIFT-OVERLAP-MORNING",
+        date="2026-01-02",
+        employee_id=first.employee_id,
+        scheduled_start="2026-01-02T07:00:00+00:00",
+        scheduled_end="2026-01-02T15:30:00+00:00",
+        status=AssignmentStatus.SCHEDULED,
+    )
+    dataset.shift_assignments.extend([first, second])
+
+    validator = DatasetValidator(dataset)
+    validator._detect_business_rule_violations()
+
+    overlaps = [
+        issue for issue in validator.detected_anomalies
+        if issue.rule_code == "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS"
+    ]
+    assert len(overlaps) == 1
+    assert first.assignment_id in overlaps[0].message
+    assert second.assignment_id in overlaps[0].message
+
+
+def test_double_booking_ignores_non_overlapping_shifts_on_same_date():
+    from dataclasses import replace
+
+    dataset = SyntheticDataGenerator(seed=20261022, scale="starter").generate()
+    _clear_active_assignments(dataset)
+    template = dataset.shift_assignments[0]
+    first = replace(
+        template,
+        assignment_id="SHIFT-SAME-DATE-AM",
+        date="2026-01-01",
+        employee_id=dataset.employees[0].employee_id,
+        scheduled_start="2026-01-01T07:00:00+00:00",
+        scheduled_end="2026-01-01T11:00:00+00:00",
+        status=AssignmentStatus.SCHEDULED,
+    )
+    second = replace(
+        template,
+        assignment_id="SHIFT-SAME-DATE-PM",
+        date="2026-01-01",
+        employee_id=first.employee_id,
+        scheduled_start="2026-01-01T12:00:00+00:00",
+        scheduled_end="2026-01-01T16:00:00+00:00",
+        status=AssignmentStatus.SCHEDULED,
+    )
+    dataset.shift_assignments.extend([first, second])
+
+    validator = DatasetValidator(dataset)
+    validator._detect_business_rule_violations()
+
+    overlaps = [
+        issue for issue in validator.detected_anomalies
+        if issue.rule_code == "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS"
+    ]
+    assert overlaps == []
+
+
+def test_double_booking_allows_back_to_back_shifts():
+    from dataclasses import replace
+
+    dataset = SyntheticDataGenerator(seed=20261022, scale="starter").generate()
+    _clear_active_assignments(dataset)
+    template = dataset.shift_assignments[0]
+    first = replace(
+        template,
+        assignment_id="SHIFT-BACK-TO-BACK-A",
+        date="2026-01-01",
+        employee_id=dataset.employees[0].employee_id,
+        scheduled_start="2026-01-01T07:00:00+00:00",
+        scheduled_end="2026-01-01T11:00:00+00:00",
+        status=AssignmentStatus.SCHEDULED,
+    )
+    second = replace(
+        template,
+        assignment_id="SHIFT-BACK-TO-BACK-B",
+        date="2026-01-01",
+        employee_id=first.employee_id,
+        scheduled_start="2026-01-01T11:00:00+00:00",
+        scheduled_end="2026-01-01T15:00:00+00:00",
+        status=AssignmentStatus.SCHEDULED,
+    )
+    dataset.shift_assignments.extend([first, second])
+
+    validator = DatasetValidator(dataset)
+    validator._detect_business_rule_violations()
+
+    overlaps = [
+        issue for issue in validator.detected_anomalies
+        if issue.rule_code == "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS"
+    ]
+    assert overlaps == []
