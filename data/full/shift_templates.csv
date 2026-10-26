@@ -1,0 +1,4 @@
+shift_template_id,shift_code,shift_name,start_time,end_time,duration_hours,is_overnight,differential_rate_multiplier
+TMPL-MORN,A,Morning Shift,07:00,15:30,8.0,False,1.0
+TMPL-AFTN,B,Afternoon Shift,15:00,23:30,8.0,False,1.15
+TMPL-NGHT,C,Night Shift,23:00,07:30,8.0,True,1.25

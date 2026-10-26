@@ -1,0 +1,5 @@
+holiday_id,holiday_date,holiday_name,region,is_mandatory_off
+HOL-2026-001,2026-01-01,New Year's Day,GLOBAL,True
+HOL-2026-002,2026-01-19,Martin Luther King Jr. Day,US,True
+HOL-2026-003,2026-02-16,Presidents' Day,US,False
+HOL-2026-004,2026-03-31,Cesar Chavez Day,US-WEST,False

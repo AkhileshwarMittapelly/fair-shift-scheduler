@@ -1,0 +1,57 @@
+[
+  {
+    "anomaly_id": "GT-000001",
+    "anomaly_type": "EMPLOYEE_DOUBLE_BOOKED",
+    "entity_type": "ShiftAssignment",
+    "primary_entity_id": "SHIFT-2026-01-01-ShiftCode.A-000001",
+    "secondary_entity_id": "SHIFT-2026-01-01-B-999001",
+    "description": "Employee EMP-000051 double-booked across shifts on date 2026-01-01",
+    "injected_timestamp": "2026-01-01T00:00:00Z",
+    "severity": "CRITICAL",
+    "expected_detection_rule": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS"
+  },
+  {
+    "anomaly_id": "GT-000002",
+    "anomaly_type": "APPROVED_LEAVE_OVERLAPS_SHIFT",
+    "entity_type": "ShiftAssignment",
+    "primary_entity_id": "SHIFT-2026-01-12-A-999002",
+    "secondary_entity_id": "LVE-2026-000001",
+    "description": "Employee EMP-000078 assigned shift during approved leave LVE-2026-000001 on 2026-01-12",
+    "injected_timestamp": "2026-01-01T00:00:00Z",
+    "severity": "CRITICAL",
+    "expected_detection_rule": "RULE_APPROVED_LEAVE_NON_CONFLICT"
+  },
+  {
+    "anomaly_id": "GT-000003",
+    "anomaly_type": "REQUIRED_SKILL_ABSENT",
+    "entity_type": "ShiftAssignment",
+    "primary_entity_id": "SHIFT-2026-01-01-ShiftCode.A-000006",
+    "secondary_entity_id": "SKILL-01",
+    "description": "Shift requires SKILL-01 but assigned employee EMP-000002 lacks certified qualification",
+    "injected_timestamp": "2026-01-01T00:00:00Z",
+    "severity": "HIGH",
+    "expected_detection_rule": "RULE_MANDATORY_ROLE_SKILL_MATCH"
+  },
+  {
+    "anomaly_id": "GT-000004",
+    "anomaly_type": "OVERTIME_CAP_EXCEEDED",
+    "entity_type": "Employee",
+    "primary_entity_id": "EMP-000003",
+    "secondary_entity_id": "SHIFT-2026-01-08-C-999003",
+    "description": "Employee EMP-000003 exceeded maximum statutory weekly overtime limit (scheduled > 52.0h)",
+    "injected_timestamp": "2026-01-01T00:00:00Z",
+    "severity": "HIGH",
+    "expected_detection_rule": "RULE_MAX_WEEKLY_LABOR_AND_OVERTIME_CAP"
+  },
+  {
+    "anomaly_id": "GT-000005",
+    "anomaly_type": "SWAP_APPLIED_WITHOUT_APPROVAL",
+    "entity_type": "SwapRequest",
+    "primary_entity_id": "SWP-2026-999001",
+    "secondary_entity_id": null,
+    "description": "Shift swap SWP-2026-999001 executed and APPLIED without required manager authorization",
+    "injected_timestamp": "2026-01-01T00:00:00Z",
+    "severity": "CRITICAL",
+    "expected_detection_rule": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
+  }
+]

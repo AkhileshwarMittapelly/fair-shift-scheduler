@@ -1,0 +1,101 @@
+team_id,team_name,department,manager_id,location,max_overtime_hours_per_week,created_at
+TEAM-001,Emergency Medicine Squad 01,Emergency Medicine,EMP-000001,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-002,Intensive Care Unit Squad 02,Intensive Care Unit,EMP-000002,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-003,Surgical Ward Squad 03,Surgical Ward,EMP-000003,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-004,Pediatrics Squad 04,Pediatrics,EMP-000004,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-005,IT Systems Operations Squad 05,IT Systems Operations,EMP-000005,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-006,Cyber Security Operations Squad 06,Cyber Security Operations,EMP-000006,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-007,Telemetry & Network Squad 07,Telemetry & Network,EMP-000007,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-008,Facilities Operations Squad 08,Facilities Operations,EMP-000008,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-009,Customer Support Center Squad 09,Customer Support Center,EMP-000009,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-010,Supply Chain Logistics Squad 10,Supply Chain Logistics,EMP-000010,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-011,Emergency Medicine Squad 11,Emergency Medicine,EMP-000011,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-012,Intensive Care Unit Squad 12,Intensive Care Unit,EMP-000012,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-013,Surgical Ward Squad 13,Surgical Ward,EMP-000013,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-014,Pediatrics Squad 14,Pediatrics,EMP-000014,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-015,IT Systems Operations Squad 15,IT Systems Operations,EMP-000015,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-016,Cyber Security Operations Squad 16,Cyber Security Operations,EMP-000016,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-017,Telemetry & Network Squad 17,Telemetry & Network,EMP-000017,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-018,Facilities Operations Squad 18,Facilities Operations,EMP-000018,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-019,Customer Support Center Squad 19,Customer Support Center,EMP-000019,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-020,Supply Chain Logistics Squad 20,Supply Chain Logistics,EMP-000020,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-021,Emergency Medicine Squad 21,Emergency Medicine,EMP-000021,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-022,Intensive Care Unit Squad 22,Intensive Care Unit,EMP-000022,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-023,Surgical Ward Squad 23,Surgical Ward,EMP-000023,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-024,Pediatrics Squad 24,Pediatrics,EMP-000024,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-025,IT Systems Operations Squad 25,IT Systems Operations,EMP-000025,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-026,Cyber Security Operations Squad 26,Cyber Security Operations,EMP-000026,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-027,Telemetry & Network Squad 27,Telemetry & Network,EMP-000027,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-028,Facilities Operations Squad 28,Facilities Operations,EMP-000028,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-029,Customer Support Center Squad 29,Customer Support Center,EMP-000029,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-030,Supply Chain Logistics Squad 30,Supply Chain Logistics,EMP-000030,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-031,Emergency Medicine Squad 31,Emergency Medicine,EMP-000031,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-032,Intensive Care Unit Squad 32,Intensive Care Unit,EMP-000032,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-033,Surgical Ward Squad 33,Surgical Ward,EMP-000033,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-034,Pediatrics Squad 34,Pediatrics,EMP-000034,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-035,IT Systems Operations Squad 35,IT Systems Operations,EMP-000035,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-036,Cyber Security Operations Squad 36,Cyber Security Operations,EMP-000036,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-037,Telemetry & Network Squad 37,Telemetry & Network,EMP-000037,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-038,Facilities Operations Squad 38,Facilities Operations,EMP-000038,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-039,Customer Support Center Squad 39,Customer Support Center,EMP-000039,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-040,Supply Chain Logistics Squad 40,Supply Chain Logistics,EMP-000040,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-041,Emergency Medicine Squad 41,Emergency Medicine,EMP-000041,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-042,Intensive Care Unit Squad 42,Intensive Care Unit,EMP-000042,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-043,Surgical Ward Squad 43,Surgical Ward,EMP-000043,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-044,Pediatrics Squad 44,Pediatrics,EMP-000044,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-045,IT Systems Operations Squad 45,IT Systems Operations,EMP-000045,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-046,Cyber Security Operations Squad 46,Cyber Security Operations,EMP-000046,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-047,Telemetry & Network Squad 47,Telemetry & Network,EMP-000047,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-048,Facilities Operations Squad 48,Facilities Operations,EMP-000048,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-049,Customer Support Center Squad 49,Customer Support Center,EMP-000049,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-050,Supply Chain Logistics Squad 50,Supply Chain Logistics,EMP-000050,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-051,Emergency Medicine Squad 51,Emergency Medicine,EMP-000051,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-052,Intensive Care Unit Squad 52,Intensive Care Unit,EMP-000052,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-053,Surgical Ward Squad 53,Surgical Ward,EMP-000053,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-054,Pediatrics Squad 54,Pediatrics,EMP-000054,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-055,IT Systems Operations Squad 55,IT Systems Operations,EMP-000055,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-056,Cyber Security Operations Squad 56,Cyber Security Operations,EMP-000056,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-057,Telemetry & Network Squad 57,Telemetry & Network,EMP-000057,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-058,Facilities Operations Squad 58,Facilities Operations,EMP-000058,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-059,Customer Support Center Squad 59,Customer Support Center,EMP-000059,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-060,Supply Chain Logistics Squad 60,Supply Chain Logistics,EMP-000060,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-061,Emergency Medicine Squad 61,Emergency Medicine,EMP-000061,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-062,Intensive Care Unit Squad 62,Intensive Care Unit,EMP-000062,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-063,Surgical Ward Squad 63,Surgical Ward,EMP-000063,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-064,Pediatrics Squad 64,Pediatrics,EMP-000064,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-065,IT Systems Operations Squad 65,IT Systems Operations,EMP-000065,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-066,Cyber Security Operations Squad 66,Cyber Security Operations,EMP-000066,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-067,Telemetry & Network Squad 67,Telemetry & Network,EMP-000067,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-068,Facilities Operations Squad 68,Facilities Operations,EMP-000068,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-069,Customer Support Center Squad 69,Customer Support Center,EMP-000069,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-070,Supply Chain Logistics Squad 70,Supply Chain Logistics,EMP-000070,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-071,Emergency Medicine Squad 71,Emergency Medicine,EMP-000071,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-072,Intensive Care Unit Squad 72,Intensive Care Unit,EMP-000072,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-073,Surgical Ward Squad 73,Surgical Ward,EMP-000073,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-074,Pediatrics Squad 74,Pediatrics,EMP-000074,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-075,IT Systems Operations Squad 75,IT Systems Operations,EMP-000075,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-076,Cyber Security Operations Squad 76,Cyber Security Operations,EMP-000076,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-077,Telemetry & Network Squad 77,Telemetry & Network,EMP-000077,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-078,Facilities Operations Squad 78,Facilities Operations,EMP-000078,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-079,Customer Support Center Squad 79,Customer Support Center,EMP-000079,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-080,Supply Chain Logistics Squad 80,Supply Chain Logistics,EMP-000080,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-081,Emergency Medicine Squad 81,Emergency Medicine,EMP-000081,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-082,Intensive Care Unit Squad 82,Intensive Care Unit,EMP-000082,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-083,Surgical Ward Squad 83,Surgical Ward,EMP-000083,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-084,Pediatrics Squad 84,Pediatrics,EMP-000084,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-085,IT Systems Operations Squad 85,IT Systems Operations,EMP-000085,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-086,Cyber Security Operations Squad 86,Cyber Security Operations,EMP-000086,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-087,Telemetry & Network Squad 87,Telemetry & Network,EMP-000087,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-088,Facilities Operations Squad 88,Facilities Operations,EMP-000088,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-089,Customer Support Center Squad 89,Customer Support Center,EMP-000089,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-090,Supply Chain Logistics Squad 90,Supply Chain Logistics,EMP-000090,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-091,Emergency Medicine Squad 91,Emergency Medicine,EMP-000091,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-092,Intensive Care Unit Squad 92,Intensive Care Unit,EMP-000092,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-093,Surgical Ward Squad 93,Surgical Ward,EMP-000093,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-094,Pediatrics Squad 94,Pediatrics,EMP-000094,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-095,IT Systems Operations Squad 95,IT Systems Operations,EMP-000095,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-096,Cyber Security Operations Squad 96,Cyber Security Operations,EMP-000096,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-097,Telemetry & Network Squad 97,Telemetry & Network,EMP-000097,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-098,Facilities Operations Squad 98,Facilities Operations,EMP-000098,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-099,Customer Support Center Squad 99,Customer Support Center,EMP-000099,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-100,Supply Chain Logistics Squad 100,Supply Chain Logistics,EMP-000100,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z

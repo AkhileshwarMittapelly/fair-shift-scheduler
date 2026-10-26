@@ -1,0 +1,11 @@
+skill_id,skill_name,category,minimum_certification_level,description
+SKILL-01,Trauma & Acute Triage,CLINICAL,SENIOR,Emergency and critical triage certification
+SKILL-02,ICU Patient Care,CLINICAL,MID,Intensive care unit monitoring and life support
+SKILL-03,Pediatric Nursing,CLINICAL,MID,Specialized inpatient pediatric care
+SKILL-04,Pharmacy Dispensation,CLINICAL,LEAD,Automated medication and infusion management
+SKILL-05,DevOps & Infrastructure,TECHNICAL,SENIOR,High-availability site reliability operations
+SKILL-06,Cyber Incident Response,TECHNICAL,MID,SOC security event triage and containment
+SKILL-07,Database Administration,TECHNICAL,SENIOR,"HA clustering, failover and transactional integrity"
+SKILL-08,Equipment Safety & OSHA,SAFETY,MID,Safety protocol adherence and hazard control
+SKILL-09,Operations Dispatch,OPERATIONAL,JUNIOR,"Shift dispatch, radio routing and logistics"
+SKILL-10,Team Leadership & Esc.,MANAGEMENT,LEAD,Incident commander and team escalation authority

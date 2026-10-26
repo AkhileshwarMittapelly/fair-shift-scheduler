@@ -1,0 +1,11 @@
+team_id,team_name,department,manager_id,location,max_overtime_hours_per_week,created_at
+TEAM-001,Emergency Medicine Squad 01,Emergency Medicine,EMP-000001,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-002,Intensive Care Unit Squad 02,Intensive Care Unit,EMP-000002,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-003,Surgical Ward Squad 03,Surgical Ward,EMP-000003,Northside Medical Center,12.0,2025-10-01T08:00:00Z
+TEAM-004,Pediatrics Squad 04,Pediatrics,EMP-000004,Eastside Regional Clinic,12.0,2025-10-01T08:00:00Z
+TEAM-005,IT Systems Operations Squad 05,IT Systems Operations,EMP-000005,Data Center West,12.0,2025-10-01T08:00:00Z
+TEAM-006,Cyber Security Operations Squad 06,Cyber Security Operations,EMP-000006,Operations Command Center Alpha,12.0,2025-10-01T08:00:00Z
+TEAM-007,Telemetry & Network Squad 07,Telemetry & Network,EMP-000007,Support Hub Central,12.0,2025-10-01T08:00:00Z
+TEAM-008,Facilities Operations Squad 08,Facilities Operations,EMP-000008,Metropolitan Campus - Tower A,12.0,2025-10-01T08:00:00Z
+TEAM-009,Customer Support Center Squad 09,Customer Support Center,EMP-000009,Metropolitan Campus - Tower B,12.0,2025-10-01T08:00:00Z
+TEAM-010,Supply Chain Logistics Squad 10,Supply Chain Logistics,EMP-000010,Northside Medical Center,12.0,2025-10-01T08:00:00Z

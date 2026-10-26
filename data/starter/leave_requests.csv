@@ -1,0 +1,151 @@
+leave_id,employee_id,start_date,end_date,leave_type,status,reason,decision_by,decision_timestamp,decision_notes
+LVE-2026-000001,EMP-000078,2026-01-12,2026-01-13,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2026-01-07T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000002,EMP-000028,2026-01-08,2026-01-12,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-28T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000003,EMP-000061,2026-01-07,2026-01-07,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-25T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000004,EMP-000006,2026-01-07,2026-01-09,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-27T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000005,EMP-000082,2026-01-10,2026-01-14,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2026-01-01T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000006,EMP-000028,2026-01-01,2026-01-02,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-21T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000007,EMP-000081,2026-01-06,2026-01-06,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2026-01-01T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000008,EMP-000023,2026-01-11,2026-01-15,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-27T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000009,EMP-000066,2026-01-03,2026-01-03,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-19T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000010,EMP-000062,2026-01-12,2026-01-13,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2026-01-01T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000011,EMP-000082,2026-01-04,2026-01-04,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-24T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000012,EMP-000042,2026-01-10,2026-01-10,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2026-01-02T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000013,EMP-000067,2026-01-11,2026-01-11,COMPENSATORY,REJECTED,Compensatory time off for on-call coverage,EMP-000001,2026-01-08T14:30:00Z,Rejected: Insufficient staffing during peak shift
+LVE-2026-000014,EMP-000097,2026-01-07,2026-01-08,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-27T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000015,EMP-000028,2026-01-09,2026-01-09,ANNUAL,REJECTED,Family vacation / personal downtime,EMP-000001,2026-01-05T14:30:00Z,Rejected: Insufficient staffing during peak shift
+LVE-2026-000016,EMP-000054,2026-01-05,2026-01-06,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-30T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000017,EMP-000032,2026-01-09,2026-01-10,PARENTAL,PENDING,Parental bonding leave,,,
+LVE-2026-000018,EMP-000065,2026-01-02,2026-01-04,BEREAVEMENT,REJECTED,Bereavement leave,EMP-000001,2025-12-29T14:30:00Z,Rejected: Insufficient staffing during peak shift
+LVE-2026-000019,EMP-000070,2026-01-04,2026-01-05,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-28T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000020,EMP-000051,2026-01-06,2026-01-07,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-22T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000021,EMP-000063,2026-01-05,2026-01-07,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-26T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000022,EMP-000021,2026-01-02,2026-01-02,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-28T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000023,EMP-000076,2026-01-02,2026-01-04,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-20T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000024,EMP-000005,2026-01-11,2026-01-13,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2026-01-02T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000025,EMP-000063,2026-01-03,2026-01-04,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-27T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000026,EMP-000055,2026-01-04,2026-01-05,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-25T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000027,EMP-000043,2026-01-03,2026-01-04,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-19T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000028,EMP-000038,2026-01-05,2026-01-06,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-24T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000029,EMP-000031,2026-01-09,2026-01-09,COMPENSATORY,REJECTED,Compensatory time off for on-call coverage,EMP-000001,2026-01-02T14:30:00Z,Rejected: Insufficient staffing during peak shift
+LVE-2026-000030,EMP-000055,2026-01-01,2026-01-01,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-26T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000031,EMP-000048,2026-01-04,2026-01-06,BEREAVEMENT,REJECTED,Bereavement leave,EMP-000001,2025-12-31T14:30:00Z,Rejected: Insufficient staffing during peak shift
+LVE-2026-000032,EMP-000030,2026-01-11,2026-01-13,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-27T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000033,EMP-000021,2026-01-10,2026-01-10,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2026-01-03T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000034,EMP-000093,2026-01-07,2026-01-09,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2026-01-02T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000035,EMP-000094,2026-01-12,2026-01-16,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-29T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000036,EMP-000019,2026-01-12,2026-01-14,PARENTAL,REJECTED,Parental bonding leave,EMP-000001,2026-01-05T14:30:00Z,Rejected: Insufficient staffing during peak shift
+LVE-2026-000037,EMP-000025,2026-01-06,2026-01-08,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-30T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000038,EMP-000021,2026-01-03,2026-01-04,BEREAVEMENT,REJECTED,Bereavement leave,EMP-000001,2025-12-27T14:30:00Z,Rejected: Insufficient staffing during peak shift
+LVE-2026-000039,EMP-000074,2026-01-12,2026-01-14,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-28T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000040,EMP-000022,2026-01-12,2026-01-16,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2026-01-02T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000041,EMP-000010,2026-01-11,2026-01-11,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2026-01-03T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000042,EMP-000033,2026-01-08,2026-01-10,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-26T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000043,EMP-000079,2026-01-13,2026-01-13,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-31T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000044,EMP-000050,2026-01-09,2026-01-10,BEREAVEMENT,PENDING,Bereavement leave,,,
+LVE-2026-000045,EMP-000093,2026-01-09,2026-01-13,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2026-01-04T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000046,EMP-000039,2026-01-08,2026-01-08,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-30T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000047,EMP-000044,2026-01-07,2026-01-07,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-24T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000048,EMP-000029,2026-01-06,2026-01-08,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-28T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000049,EMP-000010,2026-01-06,2026-01-06,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-28T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000050,EMP-000002,2026-01-06,2026-01-07,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-30T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000051,EMP-000016,2026-01-05,2026-01-05,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-21T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000052,EMP-000053,2026-01-14,2026-01-15,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2026-01-01T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000053,EMP-000001,2026-01-02,2026-01-06,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-28T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000054,EMP-000092,2026-01-10,2026-01-11,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2026-01-01T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000055,EMP-000068,2026-01-08,2026-01-09,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-24T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000056,EMP-000054,2026-01-03,2026-01-03,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-23T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000057,EMP-000048,2026-01-03,2026-01-04,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-22T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000058,EMP-000062,2026-01-05,2026-01-07,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-30T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000059,EMP-000085,2026-01-06,2026-01-10,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-29T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000060,EMP-000063,2026-01-12,2026-01-13,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2026-01-01T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000061,EMP-000037,2026-01-10,2026-01-12,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2026-01-02T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000062,EMP-000033,2026-01-06,2026-01-06,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-26T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000063,EMP-000097,2026-01-11,2026-01-13,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2026-01-04T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000064,EMP-000093,2026-01-07,2026-01-09,COMPENSATORY,PENDING,Compensatory time off for on-call coverage,,,
+LVE-2026-000065,EMP-000091,2026-01-07,2026-01-07,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-29T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000066,EMP-000018,2026-01-13,2026-01-14,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2026-01-02T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000067,EMP-000086,2026-01-13,2026-01-14,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2026-01-02T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000068,EMP-000069,2026-01-02,2026-01-03,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-22T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000069,EMP-000017,2026-01-07,2026-01-07,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-26T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000070,EMP-000053,2026-01-14,2026-01-15,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2026-01-07T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000071,EMP-000006,2026-01-01,2026-01-01,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-18T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000072,EMP-000056,2026-01-04,2026-01-04,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-24T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000073,EMP-000064,2026-01-08,2026-01-08,PARENTAL,REJECTED,Parental bonding leave,EMP-000001,2026-01-04T14:30:00Z,Rejected: Insufficient staffing during peak shift
+LVE-2026-000074,EMP-000028,2026-01-09,2026-01-11,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-29T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000075,EMP-000097,2026-01-09,2026-01-09,COMPENSATORY,PENDING,Compensatory time off for on-call coverage,,,
+LVE-2026-000076,EMP-000021,2026-01-08,2026-01-08,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-28T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000077,EMP-000050,2026-01-06,2026-01-10,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-31T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000078,EMP-000067,2026-01-06,2026-01-06,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2026-01-01T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000079,EMP-000054,2026-01-14,2026-01-14,BEREAVEMENT,PENDING,Bereavement leave,,,
+LVE-2026-000080,EMP-000022,2026-01-14,2026-01-14,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2026-01-04T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000081,EMP-000055,2026-01-06,2026-01-07,SICK,REJECTED,Medical appointment / acute recovery,EMP-000001,2026-01-01T14:30:00Z,Rejected: Insufficient staffing during peak shift
+LVE-2026-000082,EMP-000064,2026-01-01,2026-01-01,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-22T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000083,EMP-000072,2026-01-08,2026-01-08,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-26T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000084,EMP-000042,2026-01-09,2026-01-10,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-27T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000085,EMP-000064,2026-01-09,2026-01-09,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-27T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000086,EMP-000019,2026-01-04,2026-01-08,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-25T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000087,EMP-000087,2026-01-02,2026-01-06,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-24T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000088,EMP-000040,2026-01-09,2026-01-11,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-29T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000089,EMP-000061,2026-01-12,2026-01-13,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-30T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000090,EMP-000087,2026-01-02,2026-01-04,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-22T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000091,EMP-000061,2026-01-08,2026-01-08,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2026-01-02T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000092,EMP-000081,2026-01-05,2026-01-07,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-23T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000093,EMP-000077,2026-01-09,2026-01-09,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-26T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000094,EMP-000081,2026-01-04,2026-01-05,COMPENSATORY,REJECTED,Compensatory time off for on-call coverage,EMP-000001,2025-12-30T14:30:00Z,Rejected: Insufficient staffing during peak shift
+LVE-2026-000095,EMP-000091,2026-01-10,2026-01-10,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2026-01-02T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000096,EMP-000067,2026-01-02,2026-01-02,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-18T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000097,EMP-000072,2026-01-06,2026-01-08,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-22T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000098,EMP-000072,2026-01-14,2026-01-14,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2026-01-03T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000099,EMP-000055,2026-01-10,2026-01-12,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2026-01-04T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000100,EMP-000058,2026-01-01,2026-01-03,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-27T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000101,EMP-000044,2026-01-09,2026-01-10,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2026-01-01T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000102,EMP-000034,2026-01-06,2026-01-06,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-25T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000103,EMP-000023,2026-01-12,2026-01-16,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2026-01-06T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000104,EMP-000044,2026-01-13,2026-01-13,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2026-01-06T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000105,EMP-000092,2026-01-12,2026-01-12,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-30T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000106,EMP-000009,2026-01-07,2026-01-07,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-29T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000107,EMP-000081,2026-01-07,2026-01-08,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-29T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000108,EMP-000037,2026-01-04,2026-01-05,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-28T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000109,EMP-000007,2026-01-10,2026-01-10,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2026-01-04T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000110,EMP-000001,2026-01-04,2026-01-05,SICK,REJECTED,Medical appointment / acute recovery,EMP-000001,2025-12-29T14:30:00Z,Rejected: Insufficient staffing during peak shift
+LVE-2026-000111,EMP-000071,2026-01-14,2026-01-15,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2026-01-08T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000112,EMP-000073,2026-01-06,2026-01-06,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-27T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000113,EMP-000054,2026-01-05,2026-01-05,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-26T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000114,EMP-000047,2026-01-12,2026-01-12,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2026-01-02T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000115,EMP-000043,2026-01-02,2026-01-02,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-24T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000116,EMP-000090,2026-01-05,2026-01-09,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-30T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000117,EMP-000016,2026-01-12,2026-01-13,PARENTAL,PENDING,Parental bonding leave,,,
+LVE-2026-000118,EMP-000042,2026-01-10,2026-01-10,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-29T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000119,EMP-000060,2026-01-08,2026-01-09,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-26T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000120,EMP-000056,2026-01-07,2026-01-08,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-29T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000121,EMP-000050,2026-01-14,2026-01-14,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2026-01-03T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000122,EMP-000031,2026-01-11,2026-01-12,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-30T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000123,EMP-000068,2026-01-06,2026-01-06,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-28T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000124,EMP-000014,2026-01-12,2026-01-16,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2026-01-07T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000125,EMP-000098,2026-01-02,2026-01-02,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-22T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000126,EMP-000057,2026-01-14,2026-01-14,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-30T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000127,EMP-000066,2026-01-01,2026-01-01,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-24T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000128,EMP-000095,2026-01-03,2026-01-03,BEREAVEMENT,REJECTED,Bereavement leave,EMP-000001,2025-12-30T14:30:00Z,Rejected: Insufficient staffing during peak shift
+LVE-2026-000129,EMP-000032,2026-01-04,2026-01-06,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-23T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000130,EMP-000090,2026-01-02,2026-01-02,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-24T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000131,EMP-000014,2026-01-12,2026-01-13,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2026-01-05T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000132,EMP-000014,2026-01-05,2026-01-05,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-28T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000133,EMP-000071,2026-01-14,2026-01-15,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2026-01-02T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000134,EMP-000080,2026-01-01,2026-01-05,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-27T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000135,EMP-000007,2026-01-06,2026-01-08,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-29T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000136,EMP-000092,2026-01-03,2026-01-05,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2025-12-28T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000137,EMP-000004,2026-01-05,2026-01-05,ANNUAL,APPROVED,Family vacation / personal downtime,EMP-000001,2025-12-24T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000138,EMP-000048,2026-01-03,2026-01-04,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-24T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000139,EMP-000002,2026-01-05,2026-01-05,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-25T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000140,EMP-000010,2026-01-08,2026-01-08,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-29T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000141,EMP-000098,2026-01-02,2026-01-02,BEREAVEMENT,REJECTED,Bereavement leave,EMP-000001,2025-12-29T14:30:00Z,Rejected: Insufficient staffing during peak shift
+LVE-2026-000142,EMP-000093,2026-01-09,2026-01-09,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2026-01-02T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000143,EMP-000029,2026-01-12,2026-01-12,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-31T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000144,EMP-000055,2026-01-13,2026-01-13,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-29T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000145,EMP-000035,2026-01-10,2026-01-11,BEREAVEMENT,PENDING,Bereavement leave,,,
+LVE-2026-000146,EMP-000099,2026-01-12,2026-01-16,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2026-01-07T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000147,EMP-000040,2026-01-06,2026-01-06,COMPENSATORY,APPROVED,Compensatory time off for on-call coverage,EMP-000001,2026-01-01T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000148,EMP-000024,2026-01-01,2026-01-05,SICK,APPROVED,Medical appointment / acute recovery,EMP-000001,2025-12-18T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000149,EMP-000100,2026-01-12,2026-01-12,BEREAVEMENT,APPROVED,Bereavement leave,EMP-000001,2025-12-30T10:00:00Z,Approved in accordance with team leave quota
+LVE-2026-000150,EMP-000005,2026-01-01,2026-01-01,PARENTAL,APPROVED,Parental bonding leave,EMP-000001,2025-12-26T10:00:00Z,Approved in accordance with team leave quota

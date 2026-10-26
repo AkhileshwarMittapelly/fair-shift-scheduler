@@ -1,0 +1,117 @@
+{
+  "project": "Fair Shift Scheduler",
+  "version": "1.0.0",
+  "generator_seed": 20261022,
+  "scale_profile": "full",
+  "provenance": {
+    "lawful_use_notice": "100% synthetically generated using fixed deterministic seed logic. No private or scraped third-party personal data included.",
+    "jurisdiction_compliance": "FLSA and EU Working Time Directive labor constraint models."
+  },
+  "record_counts": {
+    "skills": 10,
+    "teams": 100,
+    "employees": 2000,
+    "employee_skills": 3970,
+    "shift_templates": 3,
+    "holiday_calendar": 4,
+    "coverage_requirements": 45000,
+    "leave_requests": 5000,
+    "shift_assignments": 81392,
+    "swap_requests": 201,
+    "attendance_events": 162774,
+    "ground_truth_anomalies": 5
+  },
+  "file_checksums": {
+    "attendance_events.csv": {
+      "sha256": "fb1c2e064cb5daaa2b0b1bf850887396f13fe7961ad8d37b613e78bed7c249fe",
+      "size_bytes": 23466471
+    },
+    "coverage_requirements.csv": {
+      "sha256": "afb383f3fc0ccf5bdd0cf7e46085f7e03328b902276376c82d3cdc767ebab60f",
+      "size_bytes": 2664103
+    },
+    "dataset.json": {
+      "sha256": "03af3568168dcc0e22b3fb8b50472dcb905de971b074fb62c191595b14354996",
+      "size_bytes": 111622350
+    },
+    "employees.csv": {
+      "sha256": "a43a64b36307c237b2371071cbff79b562d53d8c969cfd74afe2d5f185979e25",
+      "size_bytes": 255876
+    },
+    "employee_skills.csv": {
+      "sha256": "deaaa5bc577ae4bc0e810ef4a24a081a9c1366e1e23da173e07d9e4cdd8df6cc",
+      "size_bytes": 284917
+    },
+    "ground_truth.csv": {
+      "sha256": "e81098df9378a832dfb726d7ffa2d2c442614a4e3dee04f79b9294b9468d8da6",
+      "size_bytes": 1333
+    },
+    "ground_truth.json": {
+      "sha256": "d78a8b52621a09390ca28b2909323e9e0b8de15c22f9d6c735691728536db457",
+      "size_bytes": 2429
+    },
+    "holiday_calendar.csv": {
+      "sha256": "dd4d7d5fff8edb6408d3341cdc109a4016e7483f56a1e45c9c896f95dceb9bf8",
+      "size_bytes": 280
+    },
+    "leave_requests.csv": {
+      "sha256": "fa4cd2f4125c8d0b7b749c5ebf3f441df1ffb7886312698bc27e4cbf29dc5b25",
+      "size_bytes": 867815
+    },
+    "scheduler.db": {
+      "sha256": "ef2cad02398d3505884842cc204124cca2436ad166b8a1a8edb4eecc7e297516",
+      "size_bytes": 62529536
+    },
+    "seed_data.sql": {
+      "sha256": "4b315c21367ea4e2e7f28755014c866a2a613816c83ec415386fd16313981d44",
+      "size_bytes": 389981
+    },
+    "shift_assignments.csv": {
+      "sha256": "2b3cf7d1b3e455e984235d0878582df297cf7cf1b340f07e70e3f5219f804b5e",
+      "size_bytes": 13648105
+    },
+    "shift_templates.csv": {
+      "sha256": "67c62dfe1f7e05cfe3bfe5d8b37edf682c44f45a79cc4327dda7aaa225caf00d",
+      "size_bytes": 278
+    },
+    "skills.csv": {
+      "sha256": "ea13508ba2e312c3e405de41b04fa3a3fa91ac41d6238fb2abf6b3c69b46fb65",
+      "size_bytes": 994
+    },
+    "source_manifest.json": {
+      "sha256": "4255c9ce46cce9fba4fa21d5a1abae4b5df999ca2dc64029a3984056956a842c",
+      "size_bytes": 3615
+    },
+    "swap_requests.csv": {
+      "sha256": "d8e614b917f4f083a31bc3b66dce960c559a1af44224d6807afd48adfe36eba7",
+      "size_bytes": 47548
+    },
+    "teams.csv": {
+      "sha256": "ce7d258d096c89be61c30f9948f4aad1ac4e994aa38abeb83dcafa882d69db0e",
+      "size_bytes": 12276
+    },
+    "validation_report.json": {
+      "sha256": "ac0407fb839a5f11bf1b7d21f1d519199d534366417b506898711806d26b4f5f",
+      "size_bytes": 52728
+    },
+    "validation_report.md": {
+      "sha256": "791dc65317811a745a1a0d46c1b43397d5904beefbfb6479fc4091dae922a6ec",
+      "size_bytes": 28186
+    }
+  },
+  "validation_summary": {
+    "pk_uniqueness": true,
+    "foreign_key_integrity": true,
+    "allowed_enums": true,
+    "date_ordering": true,
+    "arithmetic_reconciliation": true,
+    "lifecycle_transitions": true,
+    "duplicate_checks": true,
+    "total_issues_logged": 0,
+    "total_anomalies_detected": 142,
+    "ground_truth_count": 5,
+    "detection_precision": 1.0,
+    "detection_recall": 1.0,
+    "detection_f1_score": 1.0
+  }
+}

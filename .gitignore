@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pytest_cache/
+.pytest_cache/
+
+# Node
+node_modules/
+.npm/
+
+# IDE / System
+.DS_Store
+Thumbs.db
+*.log
+
+# Large Binary / Generated Blobs (>50MB, reproducible via cli.py)
+*.db
+data/full/dataset.json
