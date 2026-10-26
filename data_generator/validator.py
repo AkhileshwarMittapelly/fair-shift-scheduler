@@ -37,6 +37,15 @@ from .models import (
 from .generator import GeneratedDataset
 
 
+RULE_TO_ANOMALY_TYPE: Dict[str, AnomalyType] = {
+    "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS": AnomalyType.EMPLOYEE_DOUBLE_BOOKED,
+    "RULE_APPROVED_LEAVE_NON_CONFLICT": AnomalyType.APPROVED_LEAVE_OVERLAPS_SHIFT,
+    "RULE_MANDATORY_ROLE_SKILL_MATCH": AnomalyType.REQUIRED_SKILL_ABSENT,
+    "RULE_MAX_WEEKLY_LABOR_AND_OVERTIME_CAP": AnomalyType.OVERTIME_CAP_EXCEEDED,
+    "RULE_SWAP_REQUIRES_MANAGER_APPROVAL": AnomalyType.SWAP_APPLIED_WITHOUT_APPROVAL,
+}
+
+
 @dataclass
 class ValidationIssue:
     check_name: str
@@ -45,9 +54,17 @@ class ValidationIssue:
     entity_id: str
     message: str
     rule_code: str
+    anomaly_type: Optional[AnomalyType] = None
+
+    def __post_init__(self):
+        if self.anomaly_type is None and self.rule_code in RULE_TO_ANOMALY_TYPE:
+            self.anomaly_type = RULE_TO_ANOMALY_TYPE[self.rule_code]
 
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        if self.anomaly_type is not None:
+            d["anomaly_type"] = self.anomaly_type.value if hasattr(self.anomaly_type, "value") else str(self.anomaly_type)
+        return d
 
 
 @dataclass
@@ -676,10 +693,23 @@ class DatasetValidator:
     def _matches_ground_truth(self, det: ValidationIssue, gt: GroundTruthAnomaly) -> bool:
         """
         Determines whether a detected violation corresponds to an expected
-        ground-truth anomaly at the individual entity and rule level.
+        ground-truth anomaly at the individual entity, anomaly type, and rule level.
         """
+        # Rule code check
         if det.rule_code != gt.expected_detection_rule:
             return False
+
+        # Entity type check
+        if det.entity_type != gt.entity_type:
+            return False
+
+        # Anomaly type check (if present on det or inferred from rule)
+        det_anomaly_type = det.anomaly_type or RULE_TO_ANOMALY_TYPE.get(det.rule_code)
+        if det_anomaly_type is not None:
+            det_type_str = det_anomaly_type.value if hasattr(det_anomaly_type, "value") else str(det_anomaly_type)
+            gt_type_str = gt.anomaly_type.value if hasattr(gt.anomaly_type, "value") else str(gt.anomaly_type)
+            if det_type_str != gt_type_str:
+                return False
 
         # Pairwise shift overlap matching: both primary and secondary entity IDs must match
         if det.rule_code == "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS":
@@ -768,9 +798,21 @@ class DatasetValidator:
                     ),
                 })
 
-        precision = tp / (tp + fp) if (tp + fp) > 0 else 1.0
-        recall = tp / (tp + fn) if (tp + fn) > 0 else 1.0
-        f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+        # Correct metric calculations including zero-denominator handling
+        if (tp + fp) > 0:
+            precision = tp / (tp + fp)
+        else:
+            precision = 1.0 if len(gt_list) == 0 else 0.0
+
+        if (tp + fn) > 0:
+            recall = tp / (tp + fn)
+        else:
+            recall = 1.0 if fp == 0 else 0.0
+
+        if (precision + recall) > 0:
+            f1 = (2 * precision * recall) / (precision + recall)
+        else:
+            f1 = 0.0
 
         return {
             "total_ground_truth": len(gt_list),

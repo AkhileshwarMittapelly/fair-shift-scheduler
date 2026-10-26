@@ -9,11 +9,11 @@
     "lifecycle_transitions": true,
     "duplicate_checks": true,
     "total_issues_logged": 0,
-    "total_anomalies_detected": 142,
+    "total_anomalies_detected": 7,
     "ground_truth_count": 5,
-    "detection_precision": 1.0,
+    "detection_precision": 0.7143,
     "detection_recall": 1.0,
-    "detection_f1_score": 1.0
+    "detection_f1_score": 0.8333
   },
   "structural_integrity": {
     "pk_uniqueness": true,
@@ -21,6 +21,7 @@
     "allowed_enums": true,
     "date_ordering": true,
     "arithmetic_reconciliation": true,
+    "lifecycle_transitions": true,
     "duplicate_checks": true
   },
   "detected_rule_violations": [
@@ -28,25 +29,28 @@
       "check_name": "DOUBLE_BOOKING_DETECTION",
       "severity": "ANOMALY_DETECTED",
       "entity_type": "ShiftAssignment",
-      "entity_id": "SHIFT-2026-01-01-ShiftCode.A-000001",
-      "message": "Employee EMP-000501 double-booked with 2 shifts on 2026-01-01 (SHIFT-2026-01-01-ShiftCode.A-000001, SHIFT-2026-01-01-B-999001)",
-      "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS"
+      "entity_id": "SHIFT-2026-01-01-A-000001",
+      "message": "Employee EMP-000501 has overlapping shifts SHIFT-2026-01-01-A-000001 (2026-01-01T07:00:00Z to 2026-01-01T15:30:00Z) and SHIFT-2026-01-01-B-999001 (2026-01-01T15:00:00Z to 2026-01-01T23:30:00Z)",
+      "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
+      "anomaly_type": "EMPLOYEE_DOUBLE_BOOKED"
     },
     {
       "check_name": "DOUBLE_BOOKING_DETECTION",
       "severity": "ANOMALY_DETECTED",
       "entity_type": "ShiftAssignment",
-      "entity_id": "SHIFT-2026-01-01-ShiftCode.B-000006",
-      "message": "Employee EMP-000002 double-booked with 2 shifts on 2026-01-01 (SHIFT-2026-01-01-ShiftCode.B-000006, SHIFT-2026-01-01-ShiftCode.A-000013)",
-      "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS"
+      "entity_id": "SHIFT-2026-01-08-C-999003",
+      "message": "Employee EMP-000003 has overlapping shifts SHIFT-2026-01-08-C-999003 (2026-01-08T23:00:00Z to 2026-01-09T07:30:00Z) and SHIFT-2026-01-09-A-007355 (2026-01-09T07:00:00Z to 2026-01-09T15:30:00Z)",
+      "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
+      "anomaly_type": "EMPLOYEE_DOUBLE_BOOKED"
     },
     {
       "check_name": "DOUBLE_BOOKING_DETECTION",
       "severity": "ANOMALY_DETECTED",
       "entity_type": "ShiftAssignment",
-      "entity_id": "SHIFT-2026-01-09-ShiftCode.A-007361",
-      "message": "Employee EMP-000003 double-booked with 2 shifts on 2026-01-09 (SHIFT-2026-01-09-ShiftCode.A-007361, SHIFT-2026-01-09-C-999004)",
-      "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS"
+      "entity_id": "SHIFT-2026-01-10-C-999005",
+      "message": "Employee EMP-000003 has overlapping shifts SHIFT-2026-01-10-C-999005 (2026-01-10T23:00:00Z to 2026-01-11T07:30:00Z) and SHIFT-2026-01-11-A-009027 (2026-01-11T07:00:00Z to 2026-01-11T15:30:00Z)",
+      "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
+      "anomaly_type": "EMPLOYEE_DOUBLE_BOOKED"
     },
     {
       "check_name": "LEAVE_OVERLAP_DETECTION",
@@ -54,15 +58,17 @@
       "entity_type": "ShiftAssignment",
       "entity_id": "SHIFT-2026-03-02-A-999002",
       "message": "Shift SHIFT-2026-03-02-A-999002 scheduled for EMP-001668 during approved leave LVE-2026-000002 on 2026-03-02",
-      "rule_code": "RULE_APPROVED_LEAVE_NON_CONFLICT"
+      "rule_code": "RULE_APPROVED_LEAVE_NON_CONFLICT",
+      "anomaly_type": "APPROVED_LEAVE_OVERLAPS_SHIFT"
     },
     {
       "check_name": "SKILL_ABSENCE_DETECTION",
       "severity": "ANOMALY_DETECTED",
       "entity_type": "ShiftAssignment",
-      "entity_id": "SHIFT-2026-01-01-ShiftCode.B-000006",
-      "message": "Shift SHIFT-2026-01-01-ShiftCode.B-000006 mandates skill SKILL-01 but assigned employee EMP-000002 lacks credential",
-      "rule_code": "RULE_MANDATORY_ROLE_SKILL_MATCH"
+      "entity_id": "SHIFT-2026-01-01-B-000006",
+      "message": "Shift SHIFT-2026-01-01-B-000006 mandates skill SKILL-01 but assigned employee EMP-000002 lacks credential",
+      "rule_code": "RULE_MANDATORY_ROLE_SKILL_MATCH",
+      "anomaly_type": "REQUIRED_SKILL_ABSENT"
     },
     {
       "check_name": "OVERTIME_CAP_EXCEEDED_DETECTION",
@@ -70,1087 +76,8 @@
       "entity_type": "Employee",
       "entity_id": "EMP-000003",
       "message": "Employee EMP-000003 scheduled for 56.0h in week 2, exceeding legal cap of 52.0h",
-      "rule_code": "RULE_MAX_WEEKLY_LABOR_AND_OVERTIME_CAP"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000013",
-      "message": "Swap SWP-2026-000013 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000014",
-      "message": "Swap SWP-2026-000014 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000017",
-      "message": "Swap SWP-2026-000017 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000018",
-      "message": "Swap SWP-2026-000018 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000019",
-      "message": "Swap SWP-2026-000019 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000020",
-      "message": "Swap SWP-2026-000020 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000021",
-      "message": "Swap SWP-2026-000021 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000022",
-      "message": "Swap SWP-2026-000022 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000023",
-      "message": "Swap SWP-2026-000023 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000025",
-      "message": "Swap SWP-2026-000025 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000026",
-      "message": "Swap SWP-2026-000026 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000027",
-      "message": "Swap SWP-2026-000027 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000028",
-      "message": "Swap SWP-2026-000028 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000029",
-      "message": "Swap SWP-2026-000029 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000030",
-      "message": "Swap SWP-2026-000030 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000031",
-      "message": "Swap SWP-2026-000031 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000032",
-      "message": "Swap SWP-2026-000032 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000033",
-      "message": "Swap SWP-2026-000033 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000036",
-      "message": "Swap SWP-2026-000036 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000037",
-      "message": "Swap SWP-2026-000037 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000038",
-      "message": "Swap SWP-2026-000038 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000040",
-      "message": "Swap SWP-2026-000040 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000041",
-      "message": "Swap SWP-2026-000041 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000044",
-      "message": "Swap SWP-2026-000044 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000045",
-      "message": "Swap SWP-2026-000045 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000046",
-      "message": "Swap SWP-2026-000046 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000047",
-      "message": "Swap SWP-2026-000047 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000048",
-      "message": "Swap SWP-2026-000048 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000049",
-      "message": "Swap SWP-2026-000049 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000051",
-      "message": "Swap SWP-2026-000051 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000052",
-      "message": "Swap SWP-2026-000052 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000053",
-      "message": "Swap SWP-2026-000053 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000054",
-      "message": "Swap SWP-2026-000054 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000058",
-      "message": "Swap SWP-2026-000058 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000059",
-      "message": "Swap SWP-2026-000059 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000061",
-      "message": "Swap SWP-2026-000061 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000062",
-      "message": "Swap SWP-2026-000062 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000064",
-      "message": "Swap SWP-2026-000064 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000065",
-      "message": "Swap SWP-2026-000065 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000066",
-      "message": "Swap SWP-2026-000066 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000067",
-      "message": "Swap SWP-2026-000067 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000068",
-      "message": "Swap SWP-2026-000068 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000071",
-      "message": "Swap SWP-2026-000071 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000072",
-      "message": "Swap SWP-2026-000072 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000073",
-      "message": "Swap SWP-2026-000073 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000074",
-      "message": "Swap SWP-2026-000074 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000075",
-      "message": "Swap SWP-2026-000075 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000076",
-      "message": "Swap SWP-2026-000076 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000077",
-      "message": "Swap SWP-2026-000077 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000078",
-      "message": "Swap SWP-2026-000078 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000079",
-      "message": "Swap SWP-2026-000079 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000080",
-      "message": "Swap SWP-2026-000080 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000081",
-      "message": "Swap SWP-2026-000081 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000082",
-      "message": "Swap SWP-2026-000082 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000083",
-      "message": "Swap SWP-2026-000083 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000085",
-      "message": "Swap SWP-2026-000085 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000086",
-      "message": "Swap SWP-2026-000086 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000087",
-      "message": "Swap SWP-2026-000087 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000088",
-      "message": "Swap SWP-2026-000088 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000089",
-      "message": "Swap SWP-2026-000089 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000091",
-      "message": "Swap SWP-2026-000091 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000093",
-      "message": "Swap SWP-2026-000093 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000094",
-      "message": "Swap SWP-2026-000094 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000095",
-      "message": "Swap SWP-2026-000095 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000097",
-      "message": "Swap SWP-2026-000097 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000098",
-      "message": "Swap SWP-2026-000098 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000102",
-      "message": "Swap SWP-2026-000102 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000103",
-      "message": "Swap SWP-2026-000103 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000104",
-      "message": "Swap SWP-2026-000104 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000105",
-      "message": "Swap SWP-2026-000105 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000106",
-      "message": "Swap SWP-2026-000106 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000108",
-      "message": "Swap SWP-2026-000108 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000109",
-      "message": "Swap SWP-2026-000109 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000112",
-      "message": "Swap SWP-2026-000112 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000113",
-      "message": "Swap SWP-2026-000113 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000115",
-      "message": "Swap SWP-2026-000115 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000116",
-      "message": "Swap SWP-2026-000116 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000117",
-      "message": "Swap SWP-2026-000117 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000118",
-      "message": "Swap SWP-2026-000118 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000119",
-      "message": "Swap SWP-2026-000119 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000121",
-      "message": "Swap SWP-2026-000121 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000124",
-      "message": "Swap SWP-2026-000124 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000126",
-      "message": "Swap SWP-2026-000126 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000127",
-      "message": "Swap SWP-2026-000127 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000128",
-      "message": "Swap SWP-2026-000128 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000129",
-      "message": "Swap SWP-2026-000129 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000130",
-      "message": "Swap SWP-2026-000130 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000131",
-      "message": "Swap SWP-2026-000131 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000132",
-      "message": "Swap SWP-2026-000132 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000134",
-      "message": "Swap SWP-2026-000134 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000135",
-      "message": "Swap SWP-2026-000135 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000136",
-      "message": "Swap SWP-2026-000136 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000138",
-      "message": "Swap SWP-2026-000138 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000140",
-      "message": "Swap SWP-2026-000140 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000142",
-      "message": "Swap SWP-2026-000142 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000144",
-      "message": "Swap SWP-2026-000144 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000147",
-      "message": "Swap SWP-2026-000147 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000150",
-      "message": "Swap SWP-2026-000150 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000151",
-      "message": "Swap SWP-2026-000151 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000152",
-      "message": "Swap SWP-2026-000152 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000153",
-      "message": "Swap SWP-2026-000153 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000154",
-      "message": "Swap SWP-2026-000154 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000155",
-      "message": "Swap SWP-2026-000155 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000156",
-      "message": "Swap SWP-2026-000156 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000157",
-      "message": "Swap SWP-2026-000157 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000160",
-      "message": "Swap SWP-2026-000160 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000161",
-      "message": "Swap SWP-2026-000161 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000162",
-      "message": "Swap SWP-2026-000162 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000164",
-      "message": "Swap SWP-2026-000164 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000166",
-      "message": "Swap SWP-2026-000166 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000167",
-      "message": "Swap SWP-2026-000167 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000168",
-      "message": "Swap SWP-2026-000168 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000169",
-      "message": "Swap SWP-2026-000169 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000170",
-      "message": "Swap SWP-2026-000170 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000171",
-      "message": "Swap SWP-2026-000171 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000173",
-      "message": "Swap SWP-2026-000173 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000174",
-      "message": "Swap SWP-2026-000174 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000175",
-      "message": "Swap SWP-2026-000175 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000176",
-      "message": "Swap SWP-2026-000176 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000177",
-      "message": "Swap SWP-2026-000177 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000179",
-      "message": "Swap SWP-2026-000179 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000180",
-      "message": "Swap SWP-2026-000180 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000182",
-      "message": "Swap SWP-2026-000182 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000185",
-      "message": "Swap SWP-2026-000185 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000186",
-      "message": "Swap SWP-2026-000186 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000187",
-      "message": "Swap SWP-2026-000187 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000189",
-      "message": "Swap SWP-2026-000189 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000191",
-      "message": "Swap SWP-2026-000191 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000192",
-      "message": "Swap SWP-2026-000192 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000193",
-      "message": "Swap SWP-2026-000193 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000195",
-      "message": "Swap SWP-2026-000195 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000196",
-      "message": "Swap SWP-2026-000196 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000197",
-      "message": "Swap SWP-2026-000197 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000198",
-      "message": "Swap SWP-2026-000198 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000200",
-      "message": "Swap SWP-2026-000200 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
+      "rule_code": "RULE_MAX_WEEKLY_LABOR_AND_OVERTIME_CAP",
+      "anomaly_type": "OVERTIME_CAP_EXCEEDED"
     },
     {
       "check_name": "UNAPPROVED_SWAP_DETECTION",
@@ -1158,47 +85,67 @@
       "entity_type": "SwapRequest",
       "entity_id": "SWP-2026-999001",
       "message": "Swap SWP-2026-999001 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
+      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL",
+      "anomaly_type": "SWAP_APPLIED_WITHOUT_APPROVAL"
     }
   ],
   "ground_truth_evaluation": {
     "total_ground_truth": 5,
     "true_positives": 5,
-    "false_positives": 0,
+    "false_positives": 2,
     "false_negatives": 0,
-    "precision": 1.0,
+    "precision": 0.7143,
     "recall": 1.0,
-    "f1_score": 1.0,
+    "f1_score": 0.8333,
     "breakdown": [
       {
         "ground_truth_id": "GT-000001",
         "rule": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
         "status": "DETECTED_TRUE_POSITIVE",
-        "entity_id": "SHIFT-2026-01-01-ShiftCode.A-000001"
+        "entity_id": "SHIFT-2026-01-01-A-000001",
+        "matched_on": "SHIFT-2026-01-01-A-000001"
       },
       {
         "ground_truth_id": "GT-000002",
         "rule": "RULE_APPROVED_LEAVE_NON_CONFLICT",
         "status": "DETECTED_TRUE_POSITIVE",
-        "entity_id": "SHIFT-2026-03-02-A-999002"
+        "entity_id": "SHIFT-2026-03-02-A-999002",
+        "matched_on": "SHIFT-2026-03-02-A-999002"
       },
       {
         "ground_truth_id": "GT-000003",
         "rule": "RULE_MANDATORY_ROLE_SKILL_MATCH",
         "status": "DETECTED_TRUE_POSITIVE",
-        "entity_id": "SHIFT-2026-01-01-ShiftCode.B-000006"
+        "entity_id": "SHIFT-2026-01-01-B-000006",
+        "matched_on": "SHIFT-2026-01-01-B-000006"
       },
       {
         "ground_truth_id": "GT-000004",
         "rule": "RULE_MAX_WEEKLY_LABOR_AND_OVERTIME_CAP",
         "status": "DETECTED_TRUE_POSITIVE",
-        "entity_id": "EMP-000003"
+        "entity_id": "EMP-000003",
+        "matched_on": "EMP-000003"
       },
       {
         "ground_truth_id": "GT-000005",
         "rule": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL",
         "status": "DETECTED_TRUE_POSITIVE",
-        "entity_id": "SWP-2026-999001"
+        "entity_id": "SWP-2026-999001",
+        "matched_on": "SWP-2026-999001"
+      }
+    ],
+    "incidental_baseline_violations": [
+      {
+        "entity_id": "SHIFT-2026-01-08-C-999003",
+        "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
+        "message": "Employee EMP-000003 has overlapping shifts SHIFT-2026-01-08-C-999003 (2026-01-08T23:00:00Z to 2026-01-09T07:30:00Z) and SHIFT-2026-01-09-A-007355 (2026-01-09T07:00:00Z to 2026-01-09T15:30:00Z)",
+        "classification": "INCIDENTAL_BASELINE_VIOLATION"
+      },
+      {
+        "entity_id": "SHIFT-2026-01-10-C-999005",
+        "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
+        "message": "Employee EMP-000003 has overlapping shifts SHIFT-2026-01-10-C-999005 (2026-01-10T23:00:00Z to 2026-01-11T07:30:00Z) and SHIFT-2026-01-11-A-009027 (2026-01-11T07:00:00Z to 2026-01-11T15:30:00Z)",
+        "classification": "INCIDENTAL_BASELINE_VIOLATION"
       }
     ]
   },

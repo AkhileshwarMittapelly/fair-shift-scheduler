@@ -32,10 +32,14 @@ from data_generator.models import (
     SwapStatus,
     AttendanceEventType,
     AnomalyType,
+    AttendanceEvent,
+    LeaveRequest,
+    ShiftAssignment,
+    SwapRequest,
 )
 from data_generator.generator import SyntheticDataGenerator, GeneratedDataset
 from data_generator.validator import DatasetValidator
-from data_generator.scheduler import FairShiftScheduler
+from data_generator.scheduler import FairShiftScheduler, apply_shift_swap, validate_shift_swap
 from data_generator.reproducibility import verify_reproducibility
 from data_generator.export import DatasetExporter
 
@@ -63,15 +67,40 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from server.persistence import (
+    get_db_connection,
+    load_dataset_from_db,
+    persist_leave_created,
+    persist_leave_decision,
+    persist_swap_created,
+    persist_swap_decision,
+    persist_attendance_punch,
+    persist_scheduler_results,
+    query_audit_logs,
+    run_database_integrity_check,
+)
+
 # In-memory cached dataset state for snappy UI interactions
 CURRENT_DATASET: Optional[GeneratedDataset] = None
 
 
-def get_or_load_dataset(scale: str = "starter", seed: int = 20261022) -> GeneratedDataset:
+def get_authorized_managers(dataset: GeneratedDataset) -> set[str]:
+    """
+    Extracts all authorized manager employee IDs:
+    All team.manager_id values, plus employees whose role contains 'manager', 'lead', 'supervisor', 'admin', or 'hr'.
+    """
+    managers = {t.manager_id for t in dataset.teams if t.manager_id}
+    for e in dataset.employees:
+        role_lower = getattr(e, "role", "").lower()
+        if any(term in role_lower for term in ["manager", "lead", "supervisor", "admin", "hr"]):
+            managers.add(e.employee_id)
+    return managers
+
+
+def get_or_load_dataset(scale: str = "starter", seed: int = 20261022, reload: bool = False) -> GeneratedDataset:
     global CURRENT_DATASET
-    if CURRENT_DATASET is None:
-        gen = SyntheticDataGenerator(seed=seed, scale=scale)
-        CURRENT_DATASET = gen.generate()
+    if CURRENT_DATASET is None or reload:
+        CURRENT_DATASET = load_dataset_from_db(scale=scale, seed=seed)
     return CURRENT_DATASET
 
 
@@ -108,6 +137,7 @@ class AttendancePunchRequest(BaseModel):
     assignment_id: Optional[str] = None
     event_type: str  # "CLOCK_IN" or "CLOCK_OUT"
     device_id: str = "WEB-TERMINAL-01"
+    event_timestamp: Optional[str] = None
 
 
 class GenerateParamsRequest(BaseModel):
@@ -272,6 +302,14 @@ def list_leaves(
     return [l.to_dict() for l in leaves[:limit]]
 
 
+def parse_iso_dt(dt_str: str) -> datetime.datetime:
+    clean = dt_str.replace("Z", "+00:00") if dt_str.endswith("Z") else dt_str
+    dt = datetime.datetime.fromisoformat(clean)
+    if dt.tzinfo is not None:
+        dt = dt.astimezone(datetime.timezone.utc).replace(tzinfo=None)
+    return dt
+
+
 @app.post("/api/leaves/create")
 def create_leave(payload: LeaveCreateRequest):
     dataset = get_or_load_dataset()
@@ -288,7 +326,7 @@ def create_leave(payload: LeaveCreateRequest):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Invalid date: {e}")
     try:
-        LeaveType(payload.leave_type)
+        l_type = LeaveType(payload.leave_type)
     except ValueError:
         valid = [lt.value for lt in LeaveType]
         raise HTTPException(status_code=400, detail=f"Invalid leave_type. Must be one of: {valid}")
@@ -301,7 +339,7 @@ def create_leave(payload: LeaveCreateRequest):
         employee_id=payload.employee_id,
         start_date=payload.start_date,
         end_date=payload.end_date,
-        leave_type=LeaveType(payload.leave_type),
+        leave_type=l_type,
         status=LeaveStatus.PENDING,
         reason=payload.reason,
         decision_by=None,
@@ -309,20 +347,74 @@ def create_leave(payload: LeaveCreateRequest):
         decision_notes=None,
     )
     dataset.leave_requests.insert(0, leave)
-    return leave.to_dict()
+    persist_leave_created(leave, actor_id=payload.employee_id)
+
+    res = leave.to_dict()
+    res["success"] = True
+    res["persisted"] = True
+    return res
 
 
 @app.post("/api/leaves/{leave_id}/decide")
 def decide_leave(leave_id: str, payload: LeaveDecisionRequest):
     dataset = get_or_load_dataset()
+
+    try:
+        decision_status = LeaveStatus(payload.decision)
+        if decision_status not in [LeaveStatus.APPROVED, LeaveStatus.REJECTED]:
+            raise ValueError()
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid decision '{payload.decision}'. Must be 'APPROVED' or 'REJECTED'."
+        )
+
+    target_leave: Optional[LeaveRequest] = None
     for l in dataset.leave_requests:
         if l.leave_id == leave_id:
-            l.status = LeaveStatus(payload.decision)
-            l.decision_by = payload.decision_by
-            l.decision_timestamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
-            l.decision_notes = payload.decision_notes or f"Leave marked {payload.decision} by {payload.decision_by}"
-            return l.to_dict()
-    raise HTTPException(status_code=404, detail="Leave request not found")
+            target_leave = l
+            break
+
+    if not target_leave:
+        raise HTTPException(status_code=404, detail="Leave request not found")
+
+    # Prevent silent overwrite of already finalized leave requests
+    if target_leave.status in [LeaveStatus.APPROVED, LeaveStatus.REJECTED]:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Leave request {leave_id} is already finalized ({target_leave.status.value}). State transitions cannot be overwritten."
+        )
+
+    # Manager authorization and self-approval checks
+    emp_ids = {e.employee_id for e in dataset.employees}
+    if payload.decision_by not in emp_ids:
+        raise HTTPException(status_code=400, detail=f"Manager {payload.decision_by!r} does not exist in employee records.")
+
+    authorized_managers = get_authorized_managers(dataset)
+    if payload.decision_by not in authorized_managers:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Employee {payload.decision_by} is not authorized to decide leave requests: not a designated team manager or HR."
+        )
+
+    if payload.decision_by == target_leave.employee_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Self-approval forbidden: an employee cannot approve their own leave request."
+        )
+
+    from_status = target_leave.status.value
+    target_leave.status = decision_status
+    target_leave.decision_by = payload.decision_by
+    target_leave.decision_timestamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    target_leave.decision_notes = payload.decision_notes or f"Leave marked {payload.decision} by manager {payload.decision_by}"
+
+    persist_leave_decision(target_leave, from_status=from_status, actor_id=payload.decision_by)
+
+    res = target_leave.to_dict()
+    res["success"] = True
+    res["persisted"] = True
+    return res
 
 
 @app.get("/api/swaps")
@@ -342,6 +434,9 @@ def request_swap(payload: SwapCreateRequest):
     asgn1 = asgn_map[payload.requester_assignment_id]
     asgn2 = asgn_map[payload.target_assignment_id]
 
+    if asgn1.employee_id == asgn2.employee_id:
+        raise HTTPException(status_code=400, detail="Cannot apply swap: requester and target are the same employee")
+
     counter = len(dataset.swap_requests) + 1
     swap_id = f"SWP-2026-{counter:06d}"
     now_str = datetime.datetime.now(datetime.timezone.utc).isoformat()
@@ -360,7 +455,12 @@ def request_swap(payload: SwapCreateRequest):
         decision_notes=None,
     )
     dataset.swap_requests.insert(0, swap)
-    return swap.to_dict()
+    persist_swap_created(swap, actor_id=asgn1.employee_id)
+
+    res = swap.to_dict()
+    res["success"] = True
+    res["persisted"] = True
+    return res
 
 
 @app.post("/api/swaps/{swap_id}/decide")
@@ -375,64 +475,73 @@ def decide_swap(swap_id: str, payload: SwapDecisionRequest):
         valid = [s.value for s in SwapStatus]
         raise HTTPException(status_code=400, detail=f"Invalid decision. Must be one of: {valid}")
 
+    target_swap: Optional[SwapRequest] = None
     for s in dataset.swap_requests:
         if s.swap_id == swap_id:
-            # Feasibility check before applying a swap
-            if decision_status == SwapStatus.APPLIED:
-                if s.requester_assignment_id not in asgn_map or s.target_assignment_id not in asgn_map:
-                    raise HTTPException(
-                        status_code=400,
-                        detail="Cannot apply swap: one or both referenced assignments not found",
-                    )
-                asgn1 = asgn_map[s.requester_assignment_id]
-                asgn2 = asgn_map[s.target_assignment_id]
-                if asgn1.employee_id == asgn2.employee_id:
-                    raise HTTPException(
-                        status_code=400,
-                        detail="Cannot apply swap: requester and target are the same employee",
-                    )
-                # Check requester is not on approved leave on target shift date
-                approved_leaves = {
-                    (l.employee_id, d)
-                    for l in dataset.leave_requests
-                    if l.status == LeaveStatus.APPROVED
-                    for d in (
-                        (datetime.date.fromisoformat(l.start_date)
-                         + datetime.timedelta(days=i)).isoformat()
-                        for i in range(
-                            (datetime.date.fromisoformat(l.end_date)
-                             - datetime.date.fromisoformat(l.start_date)).days + 1
-                        )
-                    )
-                }
-                if (asgn1.employee_id, asgn2.date) in approved_leaves:
-                    raise HTTPException(
-                        status_code=400,
-                        detail=f"Cannot apply swap: {asgn1.employee_id} has approved leave on {asgn2.date}",
-                    )
-                if (asgn2.employee_id, asgn1.date) in approved_leaves:
-                    raise HTTPException(
-                        status_code=400,
-                        detail=f"Cannot apply swap: {asgn2.employee_id} has approved leave on {asgn1.date}",
-                    )
+            target_swap = s
+            break
 
-            s.status = decision_status
-            s.manager_decision_by = payload.decision_by
-            s.manager_decision_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
-            s.decision_notes = payload.decision_notes or f"Swap {payload.decision} by manager {payload.decision_by}"
+    if not target_swap:
+        raise HTTPException(status_code=404, detail="Swap request not found")
 
-            if decision_status == SwapStatus.APPLIED:
-                # Execute the shift exchange
-                asgn1 = asgn_map[s.requester_assignment_id]
-                asgn2 = asgn_map[s.target_assignment_id]
-                # Swap assigned employees
-                asgn1.employee_id, asgn2.employee_id = asgn2.employee_id, asgn1.employee_id
-                asgn1.status = AssignmentStatus.SWAPPED
-                asgn2.status = AssignmentStatus.SWAPPED
+    # Prevent silent overwrite of already finalized swaps
+    if target_swap.status in [SwapStatus.APPLIED, SwapStatus.REJECTED, SwapStatus.CANCELLED]:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Swap request {swap_id} has already been finalized ({target_swap.status.value}). State transitions cannot be overwritten."
+        )
 
-            return s.to_dict()
+    # Manager authorization and self-approval checks
+    emp_ids = {e.employee_id for e in dataset.employees}
+    if payload.decision_by not in emp_ids:
+        raise HTTPException(status_code=400, detail=f"Manager {payload.decision_by!r} does not exist in employee records.")
 
-    raise HTTPException(status_code=404, detail="Swap request not found")
+    authorized_managers = get_authorized_managers(dataset)
+    if payload.decision_by not in authorized_managers:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Employee {payload.decision_by} is not authorized to decide shift swaps: not a designated manager."
+        )
+
+    if payload.decision_by in [target_swap.requester_employee_id, target_swap.target_employee_id]:
+        raise HTTPException(
+            status_code=403,
+            detail="Self-approval forbidden: participants cannot approve their own shift swap."
+        )
+
+    from_status = target_swap.status.value
+    asgn1 = asgn_map.get(target_swap.requester_assignment_id)
+    asgn2 = asgn_map.get(target_swap.target_assignment_id)
+
+    if decision_status == SwapStatus.APPLIED:
+        try:
+            apply_shift_swap(
+                swap=target_swap,
+                assignments=dataset.shift_assignments,
+                employees=dataset.employees,
+                skills=dataset.employee_skills,
+                leaves=dataset.leave_requests,
+                shift_templates=dataset.shift_templates,
+                decision_by=payload.decision_by,
+                decision_notes=payload.decision_notes,
+            )
+            persist_swap_decision(target_swap, asgn1, asgn2, from_status=from_status, actor_id=payload.decision_by)
+            res = target_swap.to_dict()
+            res["success"] = True
+            res["persisted"] = True
+            return res
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc))
+    else:
+        target_swap.status = decision_status
+        target_swap.manager_decision_by = payload.decision_by
+        target_swap.manager_decision_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        target_swap.decision_notes = payload.decision_notes or f"Swap {payload.decision} by manager {payload.decision_by}"
+        persist_swap_decision(target_swap, None, None, from_status=from_status, actor_id=payload.decision_by)
+        res = target_swap.to_dict()
+        res["success"] = True
+        res["persisted"] = True
+        return res
 
 
 @app.get("/api/attendance")
@@ -444,25 +553,107 @@ def list_attendance(limit: int = Query(default=150, le=500)):
 @app.post("/api/attendance/punch")
 def punch_attendance(payload: AttendancePunchRequest):
     dataset = get_or_load_dataset()
-    now_dt = datetime.datetime.now(datetime.timezone.utc)
+    emp_ids = {e.employee_id for e in dataset.employees}
+    if payload.employee_id not in emp_ids:
+        raise HTTPException(status_code=400, detail=f"Employee {payload.employee_id!r} not found")
+
+    try:
+        ev_type = AttendanceEventType(payload.event_type)
+    except ValueError:
+        valid = [e.value for e in AttendanceEventType]
+        raise HTTPException(status_code=400, detail=f"Invalid event_type '{payload.event_type}'. Must be one of: {valid}")
+
+    if payload.event_timestamp:
+        try:
+            now_dt = parse_iso_dt(payload.event_timestamp)
+        except Exception:
+            raise HTTPException(status_code=400, detail=f"Invalid event_timestamp format '{payload.event_timestamp}'. Expected ISO8601.")
+    else:
+        now_dt = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+
+    # Assignment matching and verification
+    asgn_map = {a.assignment_id: a for a in dataset.shift_assignments}
+    matched_asgn: Optional[ShiftAssignment] = None
+
+    if payload.assignment_id:
+        if payload.assignment_id not in asgn_map:
+            raise HTTPException(status_code=400, detail=f"Assignment {payload.assignment_id!r} not found")
+        matched_asgn = asgn_map[payload.assignment_id]
+        if matched_asgn.employee_id != payload.employee_id:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Assignment {payload.assignment_id} is assigned to employee {matched_asgn.employee_id}, not {payload.employee_id}"
+            )
+    else:
+        # Auto-match to shift of this employee nearest to punch time
+        emp_asgns = [a for a in dataset.shift_assignments if a.employee_id == payload.employee_id]
+        if emp_asgns:
+            def proximity(a: ShiftAssignment) -> float:
+                ref = a.scheduled_start if ev_type == AttendanceEventType.CLOCK_IN else a.scheduled_end
+                return abs((now_dt - parse_iso_dt(ref)).total_seconds())
+
+            emp_asgns.sort(key=proximity)
+            if proximity(emp_asgns[0]) <= 43200:  # Within 12 hours
+                matched_asgn = emp_asgns[0]
+
+    # Duplicate punch check
+    recent_punches = [p for p in dataset.attendance_events if p.employee_id == payload.employee_id]
+    if recent_punches:
+        latest = recent_punches[0]
+        # Consecutive duplicate on same assignment
+        if matched_asgn and latest.assignment_id == matched_asgn.assignment_id and latest.event_type == ev_type:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Duplicate punch detected: employee {payload.employee_id} has already recorded {ev_type.value} for assignment {matched_asgn.assignment_id}."
+            )
+        # Debounce duplicate within 30 seconds
+        try:
+            latest_dt = parse_iso_dt(latest.event_timestamp)
+            if abs((now_dt - latest_dt).total_seconds()) < 30.0 and latest.event_type == ev_type:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Duplicate punch detected: rapid re-punch within debounce threshold ({abs((now_dt - latest_dt).total_seconds()):.1f}s)."
+                )
+        except Exception:
+            pass
+
+    # Variance calculation and out-of-range check
+    diff_minutes = 0.0
+    if matched_asgn:
+        ref_time_str = matched_asgn.scheduled_start if ev_type == AttendanceEventType.CLOCK_IN else matched_asgn.scheduled_end
+        ref_dt = parse_iso_dt(ref_time_str)
+        diff_minutes = round((now_dt - ref_dt).total_seconds() / 60.0, 1)
+
+        # Out-of-range check (> 12 hours variance)
+        if abs(diff_minutes) > 720.0:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Punch rejected: timestamp is out of range for scheduled shift (variance: {diff_minutes:+.1f} min exceeds 720 min limit)."
+            )
+
     ts_str = now_dt.strftime("%Y%m%dT%H%M%S")
     att_id = f"ATT-{payload.employee_id}-{ts_str}"
 
     event = AttendanceEvent(
         attendance_id=att_id,
         employee_id=payload.employee_id,
-        assignment_id=payload.assignment_id,
-        event_type=AttendanceEventType(payload.event_type),
-        event_timestamp=now_dt.isoformat(),
+        assignment_id=matched_asgn.assignment_id if matched_asgn else None,
+        event_type=ev_type,
+        event_timestamp=now_dt.isoformat() + "Z",
         source_device=payload.device_id,
-        matched_schedule_diff_minutes=0.0,
+        matched_schedule_diff_minutes=diff_minutes,
     )
     dataset.attendance_events.insert(0, event)
-    return event.to_dict()
+    persist_attendance_punch(event)
+
+    res = event.to_dict()
+    res["success"] = True
+    res["persisted"] = True
+    return res
 
 
 @app.post("/api/scheduler/run")
-def run_scheduler_engine():
+def run_scheduler_engine(save_results: bool = Query(default=True)):
     dataset = get_or_load_dataset()
     scheduler = FairShiftScheduler(
         employees=dataset.employees,
@@ -479,13 +670,43 @@ def run_scheduler_engine():
         num_days=dataset.metadata.get("num_days", 14),
     )
 
+    is_persisted = False
+    if save_results and result.assignments:
+        dataset.shift_assignments = result.assignments
+        persist_scheduler_results(result.assignments, actor_id="FAIR_SOLVER_ENGINE")
+        is_persisted = True
+
     return {
+        "success": True,
+        "persisted": is_persisted,
         "is_feasible": result.is_feasible,
         "metrics": result.metrics.to_dict(),
         "total_scheduled_shifts": len(result.assignments),
         "total_gaps": len(result.coverage_gaps),
         "sample_decisions": [d.to_dict() for d in result.decision_logs[:20]],
     }
+
+
+@app.get("/api/database/integrity")
+def check_database_integrity_endpoint(scale: str = "starter"):
+    return run_database_integrity_check(scale=scale)
+
+
+@app.get("/api/audit/logs")
+def list_audit_logs(
+    entity_type: Optional[str] = None,
+    entity_id: Optional[str] = None,
+    actor_id: Optional[str] = None,
+    limit: int = Query(default=100, le=500),
+    scale: str = "starter",
+):
+    return query_audit_logs(
+        entity_type=entity_type,
+        entity_id=entity_id,
+        actor_id=actor_id,
+        limit=limit,
+        scale=scale,
+    )
 
 
 @app.get("/api/validation/report")

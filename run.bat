@@ -12,7 +12,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo.
-echo [2/4] Running automated unit test suite (7/7 tests)...
+echo [2/4] Running automated unit test suite (58/58 tests)...
 python -m pytest tests -v
 if %ERRORLEVEL% NEQ 0 (
     echo Unit tests failed.

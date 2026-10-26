@@ -5,8 +5,8 @@ const API_BASE = 'http://localhost:8000/api';
 export default function App() {
   const [actor, setActor] = useState('manager'); // 'employee', 'manager', 'hr', 'ops', 'admin'
   const [metrics, setMetrics] = useState(null);
-  const [teams, setTeams] = useState([]);
-  const [skills, setSkills] = useState([]);
+  const [_teams, setTeams] = useState([]);
+  const [_skills, setSkills] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [shifts, setShifts] = useState([]);
   const [leaves, setLeaves] = useState([]);
@@ -21,8 +21,6 @@ export default function App() {
   const [statusMsg, setStatusMsg] = useState('');
 
   // Selected filters
-  const [selectedTeam, setSelectedTeam] = useState('');
-  const [selectedDate, setSelectedDate] = useState('2026-01-05');
   const [selectedEmpId, setSelectedEmpId] = useState('EMP-000001');
 
   // Modals

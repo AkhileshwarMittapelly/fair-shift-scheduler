@@ -50,10 +50,10 @@ class DatasetExporter:
         sqlite_db = self.export_sqlite()
         gt_files = self.export_ground_truth()
 
-        manifest = self.create_source_manifest(validation_report)
-
         if validation_report:
             self.export_validation_reports(validation_report)
+
+        manifest = self.create_source_manifest(validation_report)
 
         return {
             "output_directory": str(self.output_dir),
@@ -145,6 +145,7 @@ class DatasetExporter:
             db_path.unlink()
 
         conn = sqlite3.connect(db_path)
+        conn.execute("PRAGMA foreign_keys = ON;")
         cur = conn.cursor()
 
         # DDL
@@ -289,12 +290,50 @@ class DatasetExporter:
             FOREIGN KEY (assignment_id) REFERENCES shift_assignments(assignment_id)
         );
 
+        CREATE TABLE IF NOT EXISTS leave_state_transitions (
+            event_id TEXT PRIMARY KEY,
+            leave_id TEXT NOT NULL,
+            from_status TEXT,
+            to_status TEXT NOT NULL,
+            changed_by TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            notes TEXT,
+            FOREIGN KEY (leave_id) REFERENCES leave_requests(leave_id),
+            FOREIGN KEY (changed_by) REFERENCES employees(employee_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS swap_state_transitions (
+            event_id TEXT PRIMARY KEY,
+            swap_id TEXT NOT NULL,
+            from_status TEXT,
+            to_status TEXT NOT NULL,
+            changed_by TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            notes TEXT,
+            FOREIGN KEY (swap_id) REFERENCES swap_requests(swap_id),
+            FOREIGN KEY (changed_by) REFERENCES employees(employee_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS audit_logs (
+            log_id TEXT PRIMARY KEY,
+            entity_type TEXT NOT NULL,
+            entity_id TEXT NOT NULL,
+            action TEXT NOT NULL,
+            actor_id TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            before_state TEXT,
+            after_state TEXT,
+            notes TEXT
+        );
+
         CREATE INDEX idx_emp_team ON employees(team_id);
         CREATE INDEX idx_asgn_date ON shift_assignments(date);
         CREATE INDEX idx_asgn_emp ON shift_assignments(employee_id);
         CREATE INDEX idx_asgn_team ON shift_assignments(team_id);
         CREATE INDEX idx_cov_date ON coverage_requirements(date);
         CREATE INDEX idx_leave_emp ON leave_requests(employee_id);
+        CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_logs(entity_type, entity_id);
+        CREATE INDEX IF NOT EXISTS idx_audit_actor ON audit_logs(actor_id);
         """)
 
         # Insert data
@@ -344,6 +383,20 @@ class DatasetExporter:
         )
 
         conn.commit()
+
+        # Database integrity and foreign key checks
+        cur.execute("PRAGMA foreign_key_check;")
+        fk_violations = cur.fetchall()
+        if fk_violations:
+            conn.close()
+            raise ValueError(f"SQLite foreign-key check failed: {fk_violations}")
+
+        cur.execute("PRAGMA integrity_check;")
+        integrity_res = cur.fetchall()
+        if integrity_res != [("ok",)]:
+            conn.close()
+            raise ValueError(f"SQLite integrity check failed: {integrity_res}")
+
         conn.close()
         return str(db_path)
 
@@ -381,7 +434,7 @@ class DatasetExporter:
         """
         file_checksums = {}
         for item in self.output_dir.glob("*.*"):
-            if item.is_file():
+            if item.is_file() and item.name != "source_manifest.json":
                 sha256 = hashlib.sha256()
                 with open(item, "rb") as f:
                     for chunk in iter(lambda: f.read(65536), b""):

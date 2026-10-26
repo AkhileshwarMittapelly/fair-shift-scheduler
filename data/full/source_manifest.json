@@ -16,23 +16,23 @@
     "holiday_calendar": 4,
     "coverage_requirements": 45000,
     "leave_requests": 5000,
-    "shift_assignments": 81392,
+    "shift_assignments": 81329,
     "swap_requests": 201,
-    "attendance_events": 162774,
+    "attendance_events": 162648,
     "ground_truth_anomalies": 5
   },
   "file_checksums": {
     "attendance_events.csv": {
-      "sha256": "fb1c2e064cb5daaa2b0b1bf850887396f13fe7961ad8d37b613e78bed7c249fe",
-      "size_bytes": 23466471
+      "sha256": "cae7859d99d829a0cf17d005bae867e421a4617b036547e3975ec111f6f81ec5",
+      "size_bytes": 21821825
     },
     "coverage_requirements.csv": {
       "sha256": "afb383f3fc0ccf5bdd0cf7e46085f7e03328b902276376c82d3cdc767ebab60f",
       "size_bytes": 2664103
     },
     "dataset.json": {
-      "sha256": "03af3568168dcc0e22b3fb8b50472dcb905de971b074fb62c191595b14354996",
-      "size_bytes": 111622350
+      "sha256": "a010a4ed444362a44ce7c2fb3509f27c33118cd95a962d3d7fbf06cffcef0227",
+      "size_bytes": 109105857
     },
     "employees.csv": {
       "sha256": "a43a64b36307c237b2371071cbff79b562d53d8c969cfd74afe2d5f185979e25",
@@ -43,12 +43,12 @@
       "size_bytes": 284917
     },
     "ground_truth.csv": {
-      "sha256": "e81098df9378a832dfb726d7ffa2d2c442614a4e3dee04f79b9294b9468d8da6",
-      "size_bytes": 1333
+      "sha256": "3e99883f2d9dd9b0bf8ab50a4b83195f87d1f5895c009ff938bd19b23eea5998",
+      "size_bytes": 1313
     },
     "ground_truth.json": {
-      "sha256": "d78a8b52621a09390ca28b2909323e9e0b8de15c22f9d6c735691728536db457",
-      "size_bytes": 2429
+      "sha256": "4464093053391d1df2a8d35748178346891d2a4caa58665c08c76256d213c450",
+      "size_bytes": 2409
     },
     "holiday_calendar.csv": {
       "sha256": "dd4d7d5fff8edb6408d3341cdc109a4016e7483f56a1e45c9c896f95dceb9bf8",
@@ -59,16 +59,16 @@
       "size_bytes": 867815
     },
     "scheduler.db": {
-      "sha256": "ef2cad02398d3505884842cc204124cca2436ad166b8a1a8edb4eecc7e297516",
-      "size_bytes": 62529536
+      "sha256": "27ad4bf2fc0e30254891ccce9902b21b9e1f5b364022f00eab7672018f39522c",
+      "size_bytes": 59240448
     },
     "seed_data.sql": {
       "sha256": "4b315c21367ea4e2e7f28755014c866a2a613816c83ec415386fd16313981d44",
       "size_bytes": 389981
     },
     "shift_assignments.csv": {
-      "sha256": "2b3cf7d1b3e455e984235d0878582df297cf7cf1b340f07e70e3f5219f804b5e",
-      "size_bytes": 13648105
+      "sha256": "7486141dd36813ef75e1f9da8d886b3d5a360b357d0ee1dd5fd56ed600bf2c99",
+      "size_bytes": 12823907
     },
     "shift_templates.csv": {
       "sha256": "67c62dfe1f7e05cfe3bfe5d8b37edf682c44f45a79cc4327dda7aaa225caf00d",
@@ -78,25 +78,21 @@
       "sha256": "ea13508ba2e312c3e405de41b04fa3a3fa91ac41d6238fb2abf6b3c69b46fb65",
       "size_bytes": 994
     },
-    "source_manifest.json": {
-      "sha256": "4255c9ce46cce9fba4fa21d5a1abae4b5df999ca2dc64029a3984056956a842c",
-      "size_bytes": 3615
-    },
     "swap_requests.csv": {
-      "sha256": "d8e614b917f4f083a31bc3b66dce960c559a1af44224d6807afd48adfe36eba7",
-      "size_bytes": 47548
+      "sha256": "fd1930d9f4e7ffcda61402be16406efc944a2381fe287060b8fe1bb8f0352c4f",
+      "size_bytes": 45075
     },
     "teams.csv": {
       "sha256": "ce7d258d096c89be61c30f9948f4aad1ac4e994aa38abeb83dcafa882d69db0e",
       "size_bytes": 12276
     },
     "validation_report.json": {
-      "sha256": "ac0407fb839a5f11bf1b7d21f1d519199d534366417b506898711806d26b4f5f",
-      "size_bytes": 52728
+      "sha256": "38dcb8e70c9f8f33cbfba02f99dc62952a89c5233608d27004efbc0b904737bb",
+      "size_bytes": 6379
     },
     "validation_report.md": {
-      "sha256": "791dc65317811a745a1a0d46c1b43397d5904beefbfb6479fc4091dae922a6ec",
-      "size_bytes": 28186
+      "sha256": "84a94a1bee200d8befccc533320122b678fa8ef86103b67142a4b9579c1ff8c8",
+      "size_bytes": 2881
     }
   },
   "validation_summary": {
@@ -108,10 +104,10 @@
     "lifecycle_transitions": true,
     "duplicate_checks": true,
     "total_issues_logged": 0,
-    "total_anomalies_detected": 142,
+    "total_anomalies_detected": 7,
     "ground_truth_count": 5,
-    "detection_precision": 1.0,
+    "detection_precision": 0.7143,
     "detection_recall": 1.0,
-    "detection_f1_score": 1.0
+    "detection_f1_score": 0.8333
   }
 }

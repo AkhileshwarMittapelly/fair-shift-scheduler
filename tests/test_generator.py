@@ -138,3 +138,120 @@ def test_applied_swaps_have_manager_approval():
         f"Found {len(bad_swaps)} APPLIED swaps without manager approval "
         f"(should only be the injected anomaly SWP-2026-999001): {bad_swaps}"
     )
+
+
+def test_baseline_satisfies_business_rules_before_anomaly_injection():
+    """Verify that baseline data satisfies all documented business rules
+    BEFORE any intentional anomalies are injected."""
+    from data_generator.validator import DatasetValidator
+    from data_generator.generator import GeneratedDataset
+
+    gen = SyntheticDataGenerator(seed=20261022, scale="starter")
+    skills = gen._generate_skills()
+    teams = gen._generate_teams()
+    employees, employee_skills = gen._generate_employees_and_skills(teams, skills)
+    gen._assign_team_managers(teams, employees)
+    shift_templates = gen._generate_shift_templates()
+    holiday_calendar = gen._generate_holidays()
+    coverage_requirements = gen._generate_coverage_requirements(teams, shift_templates, skills)
+    leave_requests = gen._generate_leave_requests(employees)
+
+    shift_assignments = gen._generate_baseline_schedules(
+        employees, employee_skills, teams, shift_templates, coverage_requirements, leave_requests
+    )
+    swap_requests = gen._generate_swap_requests(shift_assignments, employees, employee_skills)
+    attendance_events = gen._generate_attendance_events(shift_assignments)
+
+    baseline_dataset = GeneratedDataset(
+        scale="starter",
+        seed=20261022,
+        teams=teams,
+        skills=skills,
+        employees=employees,
+        employee_skills=employee_skills,
+        shift_templates=shift_templates,
+        holiday_calendar=holiday_calendar,
+        coverage_requirements=coverage_requirements,
+        leave_requests=leave_requests,
+        shift_assignments=shift_assignments,
+        swap_requests=swap_requests,
+        attendance_events=attendance_events,
+        ground_truth_anomalies=[],
+        metadata={},
+    )
+
+    validator = DatasetValidator(baseline_dataset)
+    report = validator.validate()
+
+    assert report.is_valid is True
+    assert len(report.detected_rule_violations) == 0, (
+        f"Baseline data had {len(report.detected_rule_violations)} violations before injection: "
+        f"{[(v.rule_code, v.entity_id, v.message) for v in report.detected_rule_violations]}"
+    )
+
+
+def test_scheduler_solver_shift_id_format_and_uniqueness():
+    """Verify that FairShiftScheduler produces unique shift IDs adhering to
+    the SHIFT-YYYY-MM-DD-<ShiftLetter>-<Seq> convention without enum leak."""
+    from data_generator.scheduler import FairShiftScheduler
+
+    gen = SyntheticDataGenerator(seed=20261022, scale="starter")
+    dataset = gen.generate()
+
+    scheduler = FairShiftScheduler(
+        employees=dataset.employees,
+        teams=dataset.teams,
+        skills=dataset.skills,
+        employee_skills=dataset.employee_skills,
+        shift_templates=dataset.shift_templates,
+        leave_requests=dataset.leave_requests,
+    )
+
+    result = scheduler.solve(
+        coverage_requirements=dataset.coverage_requirements,
+        start_date="2026-01-01",
+        num_days=7,
+    )
+
+    pattern = re.compile(r"^SHIFT-\d{4}-\d{2}-\d{2}-[ABC]-\d{6}$")
+    shift_ids = [a.assignment_id for a in result.assignments]
+
+    assert len(shift_ids) > 0, "Scheduler produced no assignments"
+    assert len(shift_ids) == len(set(shift_ids)), "Scheduler produced duplicate assignment IDs"
+
+    bad_format = [sid for sid in shift_ids if not pattern.match(sid)]
+    assert not bad_format, f"Scheduler produced invalid shift IDs: {bad_format[:5]}"
+
+    bad_enum = [sid for sid in shift_ids if "ShiftCode." in sid]
+    assert not bad_enum, f"Scheduler leaked ShiftCode enum: {bad_enum[:5]}"
+
+
+def test_case3_skill_injection_does_not_double_book():
+    """Verify that Case 3 (skill injection) does not produce an unintended
+    double-booking on the target employee."""
+    gen = SyntheticDataGenerator(seed=20261022, scale="starter")
+    dataset = gen.generate()
+
+    # Find the target employee for Case 3 from ground truth
+    case3_gt = next(
+        (gt for gt in dataset.ground_truth_anomalies if gt.anomaly_id == "GT-000003"),
+        None,
+    )
+    assert case3_gt is not None, "GT-000003 not found in ground truth"
+
+    # Find the assignment
+    asgn3 = next(
+        (a for a in dataset.shift_assignments if a.assignment_id == case3_gt.primary_entity_id),
+        None,
+    )
+    assert asgn3 is not None, f"Assignment {case3_gt.primary_entity_id} not found"
+
+    # Verify that this employee has exactly one shift on that date
+    same_date_shifts = [
+        a for a in dataset.shift_assignments
+        if a.employee_id == asgn3.employee_id and a.date == asgn3.date
+    ]
+    assert len(same_date_shifts) == 1, (
+        f"Employee {asgn3.employee_id} has {len(same_date_shifts)} shifts on {asgn3.date}: "
+        f"{[s.assignment_id for s in same_date_shifts]}"
+    )

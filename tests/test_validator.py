@@ -48,17 +48,13 @@ def test_ground_truth_detection_accuracy():
     )
     assert gt["recall"] == 1.0, f"Recall dropped below 1.0: {gt['recall']}"
 
-    # After fixing instance-level matching, incidental baseline violations
-    # (e.g. double-bookings introduced as side effects of the skill/OT injection)
+    # Incidental violations (the two overlapping shifts from the Case 4 overtime injection)
     # are correctly classified as False Positives rather than True Positives.
-    # Precision < 1.0 is expected and documents genuine baseline data quality issues.
-    # We assert precision > 0.5 (i.e. the majority of detections are correct).
-    assert gt["precision"] > 0.5, (
-        f"Precision {gt['precision']} is too low — "
-        f"check for runaway false positives: {gt.get('incidental_baseline_violations', [])}"
-    )
-    # Incidental violations should be documented in the report
+    assert gt["false_positives"] == 2
+    assert gt["precision"] == 0.7143
+    assert gt["f1_score"] == 0.8333
     assert "incidental_baseline_violations" in gt
+    assert len(gt["incidental_baseline_violations"]) == 2
 
 
 
@@ -679,3 +675,191 @@ def test_precision_recall_f1_manually_verifiable_dataset():
     assert metrics["recall"] == 0.5
     # F1 = 2 * (0.5 * 0.5) / (0.5 + 0.5) = 0.5
     assert metrics["f1_score"] == 0.5
+
+
+def test_ground_truth_matching_rejects_wrong_entity_id():
+    """Verify that a detection with the correct rule and anomaly type but WRONG entity ID
+    does not match the ground truth entry."""
+    gen = SyntheticDataGenerator(seed=20261022, scale="starter")
+    dataset = gen.generate()
+    validator = DatasetValidator(dataset)
+
+    gt = GroundTruthAnomaly(
+        anomaly_id="GT-ID-TEST",
+        anomaly_type=AnomalyType.REQUIRED_SKILL_ABSENT,
+        entity_type="ShiftAssignment",
+        primary_entity_id="SHIFT-CORRECT-ID",
+        secondary_entity_id=None,
+        description="Shift requires skill",
+        injected_timestamp="2026-01-01T00:00:00Z",
+        severity="HIGH",
+        expected_detection_rule="RULE_MANDATORY_ROLE_SKILL_MATCH",
+    )
+    det_wrong_id = ValidationIssue(
+        check_name="SKILL_ABSENCE_DETECTION",
+        severity="ANOMALY_DETECTED",
+        entity_type="ShiftAssignment",
+        entity_id="SHIFT-WRONG-ID",
+        message="Shift mandates skill",
+        rule_code="RULE_MANDATORY_ROLE_SKILL_MATCH",
+        anomaly_type=AnomalyType.REQUIRED_SKILL_ABSENT,
+    )
+    assert validator._matches_ground_truth(det_wrong_id, gt) is False
+
+    dataset.ground_truth_anomalies = [gt]
+    validator.detected_anomalies = [det_wrong_id]
+    metrics = validator._evaluate_ground_truth()
+
+    assert metrics["true_positives"] == 0
+    assert metrics["false_positives"] == 1
+    assert metrics["false_negatives"] == 1
+    assert metrics["precision"] == 0.0
+    assert metrics["recall"] == 0.0
+    assert metrics["f1_score"] == 0.0
+
+
+def test_ground_truth_matching_rejects_wrong_anomaly_type():
+    """Verify that a detection with the correct rule and entity ID but an explicit WRONG anomaly type
+    does not match the ground truth entry."""
+    gen = SyntheticDataGenerator(seed=20261022, scale="starter")
+    dataset = gen.generate()
+    validator = DatasetValidator(dataset)
+
+    gt = GroundTruthAnomaly(
+        anomaly_id="GT-TYPE-TEST",
+        anomaly_type=AnomalyType.REQUIRED_SKILL_ABSENT,
+        entity_type="ShiftAssignment",
+        primary_entity_id="SHIFT-2026-01-01-A-000006",
+        secondary_entity_id=None,
+        description="Shift requires skill",
+        injected_timestamp="2026-01-01T00:00:00Z",
+        severity="HIGH",
+        expected_detection_rule="RULE_MANDATORY_ROLE_SKILL_MATCH",
+    )
+    det_wrong_type = ValidationIssue(
+        check_name="SKILL_ABSENCE_DETECTION",
+        severity="ANOMALY_DETECTED",
+        entity_type="ShiftAssignment",
+        entity_id="SHIFT-2026-01-01-A-000006",
+        message="Shift mandates skill",
+        rule_code="RULE_MANDATORY_ROLE_SKILL_MATCH",
+        anomaly_type=AnomalyType.EMPLOYEE_DOUBLE_BOOKED,  # Explicit mismatched type
+    )
+    assert validator._matches_ground_truth(det_wrong_type, gt) is False
+
+    dataset.ground_truth_anomalies = [gt]
+    validator.detected_anomalies = [det_wrong_type]
+    metrics = validator._evaluate_ground_truth()
+
+    assert metrics["true_positives"] == 0
+    assert metrics["false_positives"] == 1
+    assert metrics["false_negatives"] == 1
+
+
+def test_ground_truth_matching_rejects_wrong_entity_type():
+    """Verify that a detection matching rule and ID but with a mismatched entity_type
+    (e.g. Employee vs ShiftAssignment) does not match."""
+    gen = SyntheticDataGenerator(seed=20261022, scale="starter")
+    dataset = gen.generate()
+    validator = DatasetValidator(dataset)
+
+    gt = GroundTruthAnomaly(
+        anomaly_id="GT-ENTITY-TYPE-TEST",
+        anomaly_type=AnomalyType.OVERTIME_CAP_EXCEEDED,
+        entity_type="Employee",
+        primary_entity_id="EMP-000003",
+        secondary_entity_id=None,
+        description="Employee exceeded overtime",
+        injected_timestamp="2026-01-01T00:00:00Z",
+        severity="HIGH",
+        expected_detection_rule="RULE_MAX_WEEKLY_LABOR_AND_OVERTIME_CAP",
+    )
+    det_wrong_entity_type = ValidationIssue(
+        check_name="OVERTIME_CAP_EXCEEDED_DETECTION",
+        severity="ANOMALY_DETECTED",
+        entity_type="ShiftAssignment",  # Mismatched entity type
+        entity_id="EMP-000003",
+        message="Employee scheduled for excessive hours",
+        rule_code="RULE_MAX_WEEKLY_LABOR_AND_OVERTIME_CAP",
+    )
+    assert validator._matches_ground_truth(det_wrong_entity_type, gt) is False
+
+
+def test_ground_truth_evaluation_empty_inputs_zero_division():
+    """Verify metrics calculation when both ground truth and detections are empty (empty inputs).
+    Should return TP=0, FP=0, FN=0, Precision=1.0, Recall=1.0, F1=1.0 without zero-division error."""
+    gen = SyntheticDataGenerator(seed=20261022, scale="starter")
+    dataset = gen.generate()
+    dataset.ground_truth_anomalies = []
+    validator = DatasetValidator(dataset)
+    validator.detected_anomalies = []
+
+    metrics = validator._evaluate_ground_truth()
+
+    assert metrics["total_ground_truth"] == 0
+    assert metrics["true_positives"] == 0
+    assert metrics["false_positives"] == 0
+    assert metrics["false_negatives"] == 0
+    assert metrics["precision"] == 1.0
+    assert metrics["recall"] == 1.0
+    assert metrics["f1_score"] == 1.0
+
+
+def test_ground_truth_evaluation_zero_detections_with_expected_anomalies():
+    """Verify that when ground truth anomalies exist but zero detections are made,
+    precision is 0.0 (NOT falsely reported as 1.0) and recall is 0.0."""
+    gen = SyntheticDataGenerator(seed=20261022, scale="starter")
+    dataset = gen.generate()
+    dataset.ground_truth_anomalies = [
+        GroundTruthAnomaly(
+            anomaly_id="GT-MISSED-1",
+            anomaly_type=AnomalyType.SWAP_APPLIED_WITHOUT_APPROVAL,
+            entity_type="SwapRequest",
+            primary_entity_id="SWP-2026-999001",
+            secondary_entity_id=None,
+            description="Unapproved swap",
+            injected_timestamp="2026-01-01T00:00:00Z",
+            severity="CRITICAL",
+            expected_detection_rule="RULE_SWAP_REQUIRES_MANAGER_APPROVAL",
+        )
+    ]
+    validator = DatasetValidator(dataset)
+    validator.detected_anomalies = []  # Zero detections!
+
+    metrics = validator._evaluate_ground_truth()
+
+    assert metrics["total_ground_truth"] == 1
+    assert metrics["true_positives"] == 0
+    assert metrics["false_positives"] == 0
+    assert metrics["false_negatives"] == 1
+    assert metrics["precision"] == 0.0, f"Expected 0.0 precision when 0 detections made, got {metrics['precision']}"
+    assert metrics["recall"] == 0.0
+    assert metrics["f1_score"] == 0.0
+
+
+def test_ground_truth_evaluation_pure_false_positives():
+    """Verify metrics when no GT anomalies exist but false detections are made.
+    Precision should be 0.0 and F1 should be 0.0."""
+    gen = SyntheticDataGenerator(seed=20261022, scale="starter")
+    dataset = gen.generate()
+    dataset.ground_truth_anomalies = []  # No GT anomalies
+    validator = DatasetValidator(dataset)
+    validator.detected_anomalies = [
+        ValidationIssue(
+            check_name="SPURIOUS_DETECTION",
+            severity="ANOMALY_DETECTED",
+            entity_type="ShiftAssignment",
+            entity_id="SHIFT-SPURIOUS-1",
+            message="False alarm",
+            rule_code="RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
+        )
+    ]
+
+    metrics = validator._evaluate_ground_truth()
+
+    assert metrics["true_positives"] == 0
+    assert metrics["false_positives"] == 1
+    assert metrics["false_negatives"] == 0
+    assert metrics["precision"] == 0.0
+    assert metrics["recall"] == 0.0
+    assert metrics["f1_score"] == 0.0

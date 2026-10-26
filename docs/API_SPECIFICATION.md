@@ -29,10 +29,10 @@ Aggregated workforce and operational KPIs.
   "total_leaves": 150,
   "approved_leaves": 128,
   "total_ground_truth_anomalies": 5,
-  "detected_anomalies": 5,
-  "detection_precision": 1.0,
+  "detected_anomalies": 7,
+  "detection_precision": 0.7143,
   "detection_recall": 1.0,
-  "detection_f1_score": 1.0
+  "detection_f1_score": 0.8333
 }
 ```
 

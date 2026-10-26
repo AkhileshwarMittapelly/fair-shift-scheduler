@@ -25,6 +25,8 @@ from .models import (
     CoverageRequirement,
     LeaveRequest,
     ShiftAssignment,
+    SwapRequest,
+    SwapStatus,
 )
 
 
@@ -114,8 +116,13 @@ class FairShiftScheduler:
 
         # Skills held by employee: emp_id -> set of skill_ids
         self.emp_skill_map: Dict[str, Set[str]] = {e.employee_id: set() for e in self.employees}
+        self.emp_skills_detail: Dict[Tuple[str, str], List[EmployeeSkill]] = {}
         for es in self.employee_skills:
             self.emp_skill_map[es.employee_id].add(es.skill_id)
+            key = (es.employee_id, es.skill_id)
+            if key not in self.emp_skills_detail:
+                self.emp_skills_detail[key] = []
+            self.emp_skills_detail[key].append(es)
 
         # Approved leave days: emp_id -> set of date strings
         self.emp_leave_map: Dict[str, Set[str]] = {e.employee_id: set() for e in self.employees}
@@ -126,6 +133,24 @@ class FairShiftScheduler:
                 while cur <= end:
                     self.emp_leave_map[lr.employee_id].add(cur.isoformat())
                     cur += datetime.timedelta(days=1)
+
+    def has_valid_skill(self, emp_id: str, skill_id: Optional[str], date_str: str) -> bool:
+        """
+        Verifies that the employee possesses the required skill with a valid,
+        non-expired certification on the specific shift date.
+        """
+        if not skill_id:
+            return True
+        records = self.emp_skills_detail.get((emp_id, skill_id), [])
+        if not records:
+            return False
+        for es in records:
+            if es.certified_date and es.certified_date > date_str:
+                continue
+            if es.expiry_date and es.expiry_date < date_str:
+                continue
+            return True
+        return False
 
     def solve(
         self,
@@ -144,6 +169,9 @@ class FairShiftScheduler:
 
         # State tracking structures
         emp_assignments_by_date: Dict[Tuple[str, str], ShiftAssignment] = {}  # (emp_id, date) -> ShiftAssignment
+        emp_assigned_intervals: Dict[str, List[Tuple[datetime.datetime, datetime.datetime]]] = {
+            e.employee_id: [] for e in self.employees
+        }
         emp_weekly_hours: Dict[Tuple[str, Tuple[int, int]], float] = {}  # (emp_id, (ISO year, ISO week)) -> total hours
         emp_night_shifts: Dict[str, int] = {e.employee_id: 0 for e in self.employees}
         emp_weekend_shifts: Dict[str, int] = {e.employee_id: 0 for e in self.employees}
@@ -198,22 +226,6 @@ class FairShiftScheduler:
                 # Score each candidate against hard & soft constraints
                 evaluated_candidates = []
                 for emp in candidates:
-                    # HARD CONSTRAINT 1: No double booking on the same date
-                    if (emp.employee_id, date_str) in emp_assignments_by_date:
-                        continue
-
-                    # HARD CONSTRAINT 2: No assignment during approved leave
-                    if date_str in self.emp_leave_map[emp.employee_id]:
-                        continue
-
-                    # HARD CONSTRAINT 3: Mandatory skill matching
-                    if req.skill_id and req.skill_id not in self.emp_skill_map[emp.employee_id]:
-                        continue
-
-                    # HARD CONSTRAINT 4: Maximum consecutive days
-                    if emp_consecutive_days[emp.employee_id] >= self.max_consecutive_days:
-                        continue
-
                     # Shift start & end times
                     shift_start_dt = datetime.datetime.fromisoformat(f"{date_str}T{tmpl.start_time}:00")
                     if tmpl.is_overnight:
@@ -223,12 +235,48 @@ class FairShiftScheduler:
                     else:
                         shift_end_dt = datetime.datetime.fromisoformat(f"{date_str}T{tmpl.end_time}:00")
 
-                    # HARD CONSTRAINT 5: Minimum rest period between shifts
-                    last_end = emp_last_shift_end.get(emp.employee_id)
-                    if last_end:
-                        rest_hours = (shift_start_dt - last_end).total_seconds() / 3600.0
-                        if rest_hours < self.min_rest_hours:
+                    # HARD CONSTRAINT 1: No double booking on same date or overlapping intervals
+                    if (emp.employee_id, date_str) in emp_assignments_by_date:
+                        continue
+                    has_overlap = False
+                    for prev_start, prev_end in emp_assigned_intervals[emp.employee_id]:
+                        if shift_start_dt < prev_end and prev_start < shift_end_dt:
+                            has_overlap = True
+                            break
+                    if has_overlap:
+                        continue
+
+                    # HARD CONSTRAINT 2: No assignment during approved leave (including overnight cross-midnight)
+                    if date_str in self.emp_leave_map[emp.employee_id]:
+                        continue
+                    if tmpl.is_overnight:
+                        next_day_str = (current_date + datetime.timedelta(days=1)).isoformat()
+                        if next_day_str in self.emp_leave_map[emp.employee_id]:
                             continue
+
+                    # HARD CONSTRAINT 3: Mandatory skill and active non-expired certification matching
+                    if req.skill_id and not self.has_valid_skill(emp.employee_id, req.skill_id, date_str):
+                        continue
+
+                    # HARD CONSTRAINT 4: Maximum consecutive days
+                    if emp_consecutive_days[emp.employee_id] >= self.max_consecutive_days:
+                        continue
+
+                    # HARD CONSTRAINT 5: Minimum rest period between shifts
+                    violates_rest = False
+                    for prev_start, prev_end in emp_assigned_intervals[emp.employee_id]:
+                        if shift_start_dt >= prev_end:
+                            rest_hours = (shift_start_dt - prev_end).total_seconds() / 3600.0
+                            if rest_hours < self.min_rest_hours:
+                                violates_rest = True
+                                break
+                        elif prev_start >= shift_end_dt:
+                            rest_hours = (prev_start - shift_end_dt).total_seconds() / 3600.0
+                            if rest_hours < self.min_rest_hours:
+                                violates_rest = True
+                                break
+                    if violates_rest:
+                        continue
 
                     # HARD CONSTRAINT 6: Weekly labor and overtime cap
                     current_weekly_hrs = emp_weekly_hours.get((emp.employee_id, week_key), 0.0)
@@ -262,7 +310,8 @@ class FairShiftScheduler:
                         break
 
                     # Create assignment
-                    asgn_id = f"SHIFT-{date_str}-{tmpl.shift_code}-{assignment_seq:06d}"
+                    shift_letter = tmpl.shift_code.value if hasattr(tmpl.shift_code, "value") else str(tmpl.shift_code)
+                    asgn_id = f"SHIFT-{date_str}-{shift_letter}-{assignment_seq:06d}"
                     assignment_seq += 1
 
                     asgn = ShiftAssignment(
@@ -282,6 +331,7 @@ class FairShiftScheduler:
 
                     # Update solver state
                     emp_assignments_by_date[(emp.employee_id, date_str)] = asgn
+                    emp_assigned_intervals[emp.employee_id].append((s_start, s_end))
                     emp_weekly_hours[(emp.employee_id, week_key)] = (
                         emp_weekly_hours.get((emp.employee_id, week_key), 0.0) + tmpl.duration_hours
                     )
@@ -327,18 +377,106 @@ class FairShiftScheduler:
                     )
                     decision_seq += 1
 
-        # Compute fairness and coverage metrics
+        # Compute fairness, coverage metrics, and hard constraint violations
         metrics = self._calculate_metrics(
             coverage_requirements, assignments, coverage_gaps, emp_weekly_hours, emp_night_shifts, emp_weekend_shifts
         )
 
         return SchedulingResult(
-            is_feasible=(len(coverage_gaps) == 0),
+            is_feasible=(len(coverage_gaps) == 0 and metrics.hard_constraint_violations == 0),
             assignments=assignments,
             coverage_gaps=coverage_gaps,
             metrics=metrics,
             decision_logs=decision_logs,
         )
+
+    def _count_hard_constraint_violations(self, assignments: List[ShiftAssignment]) -> int:
+        """
+        Calculates hard-constraint violations from the actual resulting schedule.
+        Checks:
+        1. Employee eligibility and non-expired skill certification on shift date.
+        2. Shifts scheduled during approved leave (including overnight shifts).
+        3. Overlapping shift intervals for the same employee.
+        4. Minimum rest period between consecutive shifts (< min_rest_hours).
+        5. Weekly contractual hours plus maximum weekly overtime cap.
+        6. Maximum consecutive working days (> max_consecutive_days).
+        """
+        violations = 0
+        emp_assignments: Dict[str, List[ShiftAssignment]] = {e.employee_id: [] for e in self.employees}
+
+        for asgn in assignments:
+            if asgn.employee_id in emp_assignments:
+                emp_assignments[asgn.employee_id].append(asgn)
+
+            # Check 1: Skill eligibility and certification validity on shift date
+            if asgn.role_skill_id:
+                if not self.has_valid_skill(asgn.employee_id, asgn.role_skill_id, asgn.date):
+                    violations += 1
+
+            # Check 2: Shift scheduled during approved leave (including cross-midnight)
+            s_start = parse_dt(asgn.scheduled_start)
+            s_end = parse_dt(asgn.scheduled_end)
+            on_leave = False
+            for lr in self.leave_requests:
+                if lr.employee_id == asgn.employee_id and lr.status == LeaveStatus.APPROVED:
+                    l_start = datetime.datetime.combine(datetime.date.fromisoformat(lr.start_date), datetime.time.min)
+                    l_end = datetime.datetime.combine(datetime.date.fromisoformat(lr.end_date) + datetime.timedelta(days=1), datetime.time.min)
+                    if s_start < l_end and l_start < s_end:
+                        on_leave = True
+                        break
+            if on_leave:
+                violations += 1
+
+        for emp_id, emp_asgns in emp_assignments.items():
+            if not emp_asgns:
+                continue
+            emp = self.emp_map.get(emp_id)
+            if not emp:
+                continue
+
+            # Sort assignments chronologically
+            sorted_asgns = sorted(emp_asgns, key=lambda a: parse_dt(a.scheduled_start))
+
+            # Check 3 & 4: Overlaps and minimum rest periods between consecutive shifts
+            for i in range(len(sorted_asgns) - 1):
+                cur_end = parse_dt(sorted_asgns[i].scheduled_end)
+                next_start = parse_dt(sorted_asgns[i + 1].scheduled_start)
+
+                if next_start < cur_end:
+                    # Overlapping shift
+                    violations += 1
+                else:
+                    rest_hrs = (next_start - cur_end).total_seconds() / 3600.0
+                    if rest_hrs < self.min_rest_hours:
+                        violations += 1
+
+            # Check 5: Weekly contractual working hours and overtime cap
+            weekly_hours: Dict[Tuple[int, int], float] = {}
+            for asgn in emp_asgns:
+                tmpl = self.tmpl_map.get(asgn.shift_template_id)
+                dur = tmpl.duration_hours if tmpl else (parse_dt(asgn.scheduled_end) - parse_dt(asgn.scheduled_start)).total_seconds() / 3600.0
+                dt = datetime.date.fromisoformat(asgn.date)
+                iso_cal = dt.isocalendar()
+                w_key = (iso_cal.year, iso_cal.week)
+                weekly_hours[w_key] = weekly_hours.get(w_key, 0.0) + dur
+
+            max_allowed = emp.contract_hours_per_week + emp.max_weekly_overtime_hours
+            for w_key, tot_hrs in weekly_hours.items():
+                if tot_hrs > max_allowed:
+                    violations += 1
+
+            # Check 6: Maximum consecutive working days
+            work_dates = sorted({datetime.date.fromisoformat(a.date) for a in emp_asgns})
+            consecutive = 1
+            for i in range(len(work_dates) - 1):
+                if work_dates[i + 1] == work_dates[i] + datetime.timedelta(days=1):
+                    consecutive += 1
+                    if consecutive > self.max_consecutive_days:
+                        violations += 1
+                else:
+                    consecutive = 1
+
+        return violations
 
     def _calculate_metrics(
         self,
@@ -380,6 +518,8 @@ class FairShiftScheduler:
         weekend_vals = list(emp_weekend_shifts.values())
         weekend_equity = max(0.0, min(100.0, 100.0 - self._compute_cv(weekend_vals) * 50.0))
 
+        violations = self._count_hard_constraint_violations(assignments)
+
         return SchedulingMetrics(
             total_requirements=total_reqs,
             fulfilled_requirements=fulfilled,
@@ -392,7 +532,7 @@ class FairShiftScheduler:
             fairness_std_dev_hours=round(std_dev, 2),
             night_shift_equity_score=round(night_equity, 1),
             weekend_shift_equity_score=round(weekend_equity, 1),
-            hard_constraint_violations=0,  # Strict solver guarantees 0 violations
+            hard_constraint_violations=violations,
         )
 
     @staticmethod
@@ -422,3 +562,194 @@ class FairShiftScheduler:
         mean = sum(values) / len(values)
         variance = sum((x - mean) ** 2 for x in values) / len(values)
         return math.sqrt(variance) / mean
+
+
+def parse_dt(dt_val: str | datetime.datetime) -> datetime.datetime:
+    """Parses a datetime string or datetime object into a naive UTC datetime."""
+    if isinstance(dt_val, datetime.datetime):
+        dt = dt_val
+    else:
+        clean = dt_val.replace("Z", "+00:00") if dt_val.endswith("Z") else dt_val
+        dt = datetime.datetime.fromisoformat(clean)
+    if dt.tzinfo is not None:
+        dt = dt.astimezone(datetime.timezone.utc).replace(tzinfo=None)
+    return dt
+
+
+def validate_shift_swap(
+    swap: SwapRequest,
+    assignments: List[ShiftAssignment],
+    employees: List[Employee],
+    skills: List[EmployeeSkill],
+    leaves: List[LeaveRequest],
+    shift_templates: List[ShiftTemplate],
+    min_rest_hours: float = 11.0,
+) -> Tuple[bool, Optional[str]]:
+    """
+    Validates employee eligibility, approved leave, overlapping shifts,
+    minimum rest periods, and weekly working-hour limits before applying a swap.
+    Returns (True, None) if valid, or (False, error_message) if invalid.
+    """
+    asgn_map = {a.assignment_id: a for a in assignments}
+    if swap.requester_assignment_id not in asgn_map or swap.target_assignment_id not in asgn_map:
+        return False, "Cannot apply swap: one or both referenced assignments not found"
+
+    asgn1 = asgn_map[swap.requester_assignment_id]
+    asgn2 = asgn_map[swap.target_assignment_id]
+
+    emp1_id = asgn1.employee_id
+    emp2_id = asgn2.employee_id
+
+    if emp1_id == emp2_id:
+        return False, "Cannot apply swap: requester and target are the same employee"
+
+    emp_map = {e.employee_id: e for e in employees}
+    emp1 = emp_map.get(emp1_id)
+    emp2 = emp_map.get(emp2_id)
+    if not emp1 or not emp2:
+        return False, "Cannot apply swap: employee record not found"
+
+    tmpl_map = {st.shift_template_id: st for st in shift_templates}
+    tmpl1 = tmpl_map.get(asgn1.shift_template_id)
+    tmpl2 = tmpl_map.get(asgn2.shift_template_id)
+    if not tmpl1 or not tmpl2:
+        return False, "Cannot apply swap: shift template not found"
+
+    # Helper for skill validation
+    emp_skills_detail: Dict[Tuple[str, str], List[EmployeeSkill]] = {}
+    for es in skills:
+        key = (es.employee_id, es.skill_id)
+        if key not in emp_skills_detail:
+            emp_skills_detail[key] = []
+        emp_skills_detail[key].append(es)
+
+    def has_skill_cert(e_id: str, sk_id: Optional[str], d_str: str) -> bool:
+        if not sk_id:
+            return True
+        records = emp_skills_detail.get((e_id, sk_id), [])
+        if not records:
+            return False
+        for es in records:
+            if es.certified_date and es.certified_date > d_str:
+                continue
+            if es.expiry_date and es.expiry_date < d_str:
+                continue
+            return True
+        return False
+
+    # 1. Eligibility: Check required skills and non-expired certifications
+    if asgn2.role_skill_id and not has_skill_cert(emp1_id, asgn2.role_skill_id, asgn2.date):
+        return False, f"Employee {emp1_id} lacks valid or unexpired certification for required skill {asgn2.role_skill_id} on {asgn2.date}"
+    if asgn1.role_skill_id and not has_skill_cert(emp2_id, asgn1.role_skill_id, asgn1.date):
+        return False, f"Employee {emp2_id} lacks valid or unexpired certification for required skill {asgn1.role_skill_id} on {asgn1.date}"
+
+    # 2. Approved leave conflicts (including cross-midnight shifts)
+    def check_leave_conflict(e_id: str, s_start_dt: datetime.datetime, s_end_dt: datetime.datetime, d_str: str) -> Optional[str]:
+        for lr in leaves:
+            if lr.employee_id == e_id and lr.status == LeaveStatus.APPROVED:
+                l_start = datetime.datetime.combine(datetime.date.fromisoformat(lr.start_date), datetime.time.min)
+                l_end = datetime.datetime.combine(datetime.date.fromisoformat(lr.end_date) + datetime.timedelta(days=1), datetime.time.min)
+                if s_start_dt < l_end and l_start < s_end_dt:
+                    return f"Employee {e_id} has approved leave during proposed shift on {d_str}"
+        return None
+
+    s1_start = parse_dt(asgn1.scheduled_start)
+    s1_end = parse_dt(asgn1.scheduled_end)
+    s2_start = parse_dt(asgn2.scheduled_start)
+    s2_end = parse_dt(asgn2.scheduled_end)
+
+    err1 = check_leave_conflict(emp1_id, s2_start, s2_end, asgn2.date)
+    if err1:
+        return False, err1
+    err2 = check_leave_conflict(emp2_id, s1_start, s1_end, asgn1.date)
+    if err2:
+        return False, err2
+
+    # 3 & 4. Overlapping shifts and minimum rest periods under proposed schedule
+    for target_emp, target_id, removed_asgn_id, added_interval, added_dur, added_date in [
+        (emp1, emp1_id, asgn1.assignment_id, (s2_start, s2_end), tmpl2.duration_hours, asgn2.date),
+        (emp2, emp2_id, asgn2.assignment_id, (s1_start, s1_end), tmpl1.duration_hours, asgn1.date),
+    ]:
+        other_intervals = [
+            (parse_dt(a.scheduled_start), parse_dt(a.scheduled_end))
+            for a in assignments
+            if a.employee_id == target_id and a.assignment_id != removed_asgn_id
+        ]
+        other_intervals.append(added_interval)
+        other_intervals.sort(key=lambda x: x[0])
+
+        for i in range(len(other_intervals) - 1):
+            cur_end = other_intervals[i][1]
+            next_start = other_intervals[i + 1][0]
+            if next_start < cur_end:
+                return False, f"Employee {target_id} would have overlapping shifts ({other_intervals[i][0].isoformat()} and {next_start.isoformat()})"
+            rest_hrs = (next_start - cur_end).total_seconds() / 3600.0
+            if rest_hrs < min_rest_hours:
+                return False, f"Employee {target_id} would have insufficient rest ({rest_hrs:.1f}h < {min_rest_hours}h) between consecutive shifts"
+
+        # 5. Weekly working-hour limits and overtime cap
+        weekly_hours: Dict[Tuple[int, int], float] = {}
+        for a in assignments:
+            if a.employee_id == target_id and a.assignment_id != removed_asgn_id:
+                t = tmpl_map.get(a.shift_template_id)
+                dur = t.duration_hours if t else (parse_dt(a.scheduled_end) - parse_dt(a.scheduled_start)).total_seconds() / 3600.0
+                dt = datetime.date.fromisoformat(a.date)
+                iso = dt.isocalendar()
+                w_key = (iso.year, iso.week)
+                weekly_hours[w_key] = weekly_hours.get(w_key, 0.0) + dur
+
+        add_dt = datetime.date.fromisoformat(added_date)
+        add_iso = add_dt.isocalendar()
+        add_w_key = (add_iso.year, add_iso.week)
+        weekly_hours[add_w_key] = weekly_hours.get(add_w_key, 0.0) + added_dur
+
+        max_allowed = target_emp.contract_hours_per_week + target_emp.max_weekly_overtime_hours
+        for w_key, tot_hrs in weekly_hours.items():
+            if tot_hrs > max_allowed:
+                return False, f"Employee {target_id} would exceed weekly hours limit ({tot_hrs:.1f}h > {max_allowed:.1f}h allowed in week {w_key[1]})"
+
+    return True, None
+
+
+def apply_shift_swap(
+    swap: SwapRequest,
+    assignments: List[ShiftAssignment],
+    employees: List[Employee],
+    skills: List[EmployeeSkill],
+    leaves: List[LeaveRequest],
+    shift_templates: List[ShiftTemplate],
+    min_rest_hours: float = 11.0,
+    decision_by: Optional[str] = None,
+    decision_notes: Optional[str] = None,
+) -> SwapRequest:
+    """
+    Validates and atomically applies a shift swap.
+    Raises ValueError on validation failure without modifying any assignment.
+    """
+    is_valid, err_msg = validate_shift_swap(
+        swap=swap,
+        assignments=assignments,
+        employees=employees,
+        skills=skills,
+        leaves=leaves,
+        shift_templates=shift_templates,
+        min_rest_hours=min_rest_hours,
+    )
+    if not is_valid:
+        raise ValueError(err_msg or "Shift swap validation failed")
+
+    asgn_map = {a.assignment_id: a for a in assignments}
+    asgn1 = asgn_map[swap.requester_assignment_id]
+    asgn2 = asgn_map[swap.target_assignment_id]
+
+    # Atomically swap assignments and update statuses
+    asgn1.employee_id, asgn2.employee_id = asgn2.employee_id, asgn1.employee_id
+    asgn1.status = AssignmentStatus.SWAPPED
+    asgn2.status = AssignmentStatus.SWAPPED
+
+    swap.status = SwapStatus.APPLIED
+    swap.manager_decision_by = decision_by
+    swap.manager_decision_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    swap.decision_notes = decision_notes or f"Swap approved and applied by {decision_by}"
+
+    return swap

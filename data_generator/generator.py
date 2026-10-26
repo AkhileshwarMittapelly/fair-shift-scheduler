@@ -931,8 +931,20 @@ class SyntheticDataGenerator:
 
         if target_emp_for_skill:
             asgn_skill_absent = assignments[5]
+            prev_emp_id = asgn_skill_absent.employee_id
             asgn_skill_absent.employee_id = target_emp_for_skill.employee_id
             asgn_skill_absent.role_skill_id = "SKILL-01"  # Requires SKILL-01 which emp lacks
+
+            # Prevent incidental double-booking: if target employee already has a shift on this date,
+            # swap the previous employee into that shift.
+            for other_asgn in assignments:
+                if (
+                    other_asgn is not asgn_skill_absent
+                    and other_asgn.employee_id == target_emp_for_skill.employee_id
+                    and other_asgn.date == asgn_skill_absent.date
+                ):
+                    other_asgn.employee_id = prev_emp_id
+                    break
 
             anomalies.append(
                 GroundTruthAnomaly(

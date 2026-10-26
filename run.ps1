@@ -6,7 +6,7 @@ Write-Host "====================================================================
 Write-Host "`n[1/4] Installing Python dependencies..." -ForegroundColor Yellow
 python -m pip install -r requirements.txt
 
-Write-Host "`n[2/4] Running automated unit test suite (7/7 tests)..." -ForegroundColor Yellow
+Write-Host "`n[2/4] Running automated unit test suite (58/58 tests)..." -ForegroundColor Yellow
 python -m pytest tests -v
 
 Write-Host "`n[3/4] Running Step 10 Dual-Generation Reproducibility Verification..." -ForegroundColor Yellow

@@ -36,8 +36,9 @@ console = Console(safe_box=True)
 
 
 def handle_generate(args):
+    out_dir = args.out or f"data/{args.scale}"
     console.print(f"[bold cyan][*] Starting Synthetic Data Generation[/bold cyan]")
-    console.print(f"Scale: [green]{args.scale}[/green] | Seed: [yellow]{args.seed}[/yellow] | Output: [magenta]{args.out}[/magenta]\n")
+    console.print(f"Scale: [green]{args.scale}[/green] | Seed: [yellow]{args.seed}[/yellow] | Output: [magenta]{out_dir}[/magenta]\n")
 
     gen = SyntheticDataGenerator(seed=args.seed, scale=args.scale)
     dataset = gen.generate()
@@ -52,10 +53,10 @@ def handle_generate(args):
     report = validator.validate()
 
     # Export
-    exporter = DatasetExporter(dataset, args.out)
+    exporter = DatasetExporter(dataset, out_dir)
     exported = exporter.export_all(report)
 
-    console.print(f"\n[bold green][+] Successfully exported all datasets to: {args.out}[/bold green]")
+    console.print(f"\n[bold green][+] Successfully exported all datasets to: {out_dir}[/bold green]")
     console.print(f"  - CSV files: {len(exported['csv_files'])} tables")
     console.print(f"  - SQLite DB: {exported['sqlite_db']}")
     console.print(f"  - Ground Truth: {exported['ground_truth_files']['ground_truth_csv']}")
@@ -154,7 +155,7 @@ def main():
     gen_parser = subparsers.add_parser("generate", help="Generate synthetic data")
     gen_parser.add_argument("--scale", choices=["starter", "full"], default="starter", help="Dataset scale")
     gen_parser.add_argument("--seed", type=int, default=20261022, help="Deterministic integer seed")
-    gen_parser.add_argument("--out", default="data/starter", help="Output directory")
+    gen_parser.add_argument("--out", default=None, help="Output directory (defaults to data/<scale>)")
 
     # Verify Reproducibility
     repro_parser = subparsers.add_parser("verify-reproducibility", help="Verify bit-for-bit reproducibility")

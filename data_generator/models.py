@@ -38,6 +38,9 @@ class ShiftCode(str, Enum):
     def __str__(self) -> str:
         return self.value
 
+    def __format__(self, format_spec: str) -> str:
+        return self.value.__format__(format_spec)
+
 
 class LeaveType(str, Enum):
     ANNUAL = "ANNUAL"
