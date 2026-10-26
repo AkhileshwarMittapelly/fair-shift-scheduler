@@ -2,6 +2,13 @@
 FastAPI REST API Server for Fair Shift Scheduler.
 Connects the backend solver, validator, generator, and operational databases
 to the frontend interactive application.
+
+Runtime persistence note:
+  All in-memory state (CURRENT_DATASET) lives for the lifetime of the server
+  process. Changes made via the API (leave decisions, swap decisions, attendance
+  punches) persist in memory across requests but are NOT written to disk unless
+  the /api/generator/run endpoint is called, which re-exports to data/<scale>/.
+  Restarting the server resets all in-memory state.
 """
 
 from __future__ import annotations
@@ -38,11 +45,21 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Allowed CORS origins. Never use wildcard with allow_credentials=True as
+# that violates the CORS spec and is rejected by browsers.
+ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -122,12 +139,23 @@ def get_metrics():
     tmpl_map = {t.shift_template_id: t.duration_hours for t in dataset.shift_templates}
     total_hours = sum(tmpl_map.get(a.shift_template_id, 8.0) for a in dataset.shift_assignments)
 
-    # Overtime hours
-    emp_hours: Dict[str, float] = {}
+    # Overtime hours — computed correctly per (employee_id, iso_week) not aggregate
+    emp_week_hours: Dict[tuple, float] = {}
     for a in dataset.shift_assignments:
-        emp_hours[a.employee_id] = emp_hours.get(a.employee_id, 0.0) + tmpl_map.get(a.shift_template_id, 8.0)
+        try:
+            shift_date = datetime.date.fromisoformat(a.date)
+            week_num = shift_date.isocalendar()[1]
+        except (ValueError, AttributeError):
+            continue
+        key = (a.employee_id, week_num)
+        emp_week_hours[key] = emp_week_hours.get(key, 0.0) + tmpl_map.get(a.shift_template_id, 8.0)
 
-    total_overtime = sum(max(0.0, h - (40.0 * 2)) for h in emp_hours.values())  # 2-week starter window approx
+    emp_map = {e.employee_id: e for e in dataset.employees}
+    total_overtime = 0.0
+    for (emp_id, _week), week_hrs in emp_week_hours.items():
+        emp = emp_map.get(emp_id)
+        contract_hrs = emp.contract_hours_per_week if emp else 40.0
+        total_overtime += max(0.0, week_hrs - contract_hrs)
 
     return {
         "scale": dataset.scale,
@@ -247,6 +275,24 @@ def list_leaves(
 @app.post("/api/leaves/create")
 def create_leave(payload: LeaveCreateRequest):
     dataset = get_or_load_dataset()
+
+    # Input validation
+    emp_ids = {e.employee_id for e in dataset.employees}
+    if payload.employee_id not in emp_ids:
+        raise HTTPException(status_code=400, detail=f"Employee {payload.employee_id!r} not found")
+    try:
+        start_d = datetime.date.fromisoformat(payload.start_date)
+        end_d = datetime.date.fromisoformat(payload.end_date)
+        if end_d < start_d:
+            raise ValueError("end_date must be >= start_date")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid date: {e}")
+    try:
+        LeaveType(payload.leave_type)
+    except ValueError:
+        valid = [lt.value for lt in LeaveType]
+        raise HTTPException(status_code=400, detail=f"Invalid leave_type. Must be one of: {valid}")
+
     counter = len(dataset.leave_requests) + 1
     leave_id = f"LVE-2026-{counter:06d}"
 
@@ -322,9 +368,54 @@ def decide_swap(swap_id: str, payload: SwapDecisionRequest):
     dataset = get_or_load_dataset()
     asgn_map = {a.assignment_id: a for a in dataset.shift_assignments}
 
+    # Input validation
+    try:
+        decision_status = SwapStatus(payload.decision)
+    except ValueError:
+        valid = [s.value for s in SwapStatus]
+        raise HTTPException(status_code=400, detail=f"Invalid decision. Must be one of: {valid}")
+
     for s in dataset.swap_requests:
         if s.swap_id == swap_id:
-            decision_status = SwapStatus(payload.decision)
+            # Feasibility check before applying a swap
+            if decision_status == SwapStatus.APPLIED:
+                if s.requester_assignment_id not in asgn_map or s.target_assignment_id not in asgn_map:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Cannot apply swap: one or both referenced assignments not found",
+                    )
+                asgn1 = asgn_map[s.requester_assignment_id]
+                asgn2 = asgn_map[s.target_assignment_id]
+                if asgn1.employee_id == asgn2.employee_id:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Cannot apply swap: requester and target are the same employee",
+                    )
+                # Check requester is not on approved leave on target shift date
+                approved_leaves = {
+                    (l.employee_id, d)
+                    for l in dataset.leave_requests
+                    if l.status == LeaveStatus.APPROVED
+                    for d in (
+                        (datetime.date.fromisoformat(l.start_date)
+                         + datetime.timedelta(days=i)).isoformat()
+                        for i in range(
+                            (datetime.date.fromisoformat(l.end_date)
+                             - datetime.date.fromisoformat(l.start_date)).days + 1
+                        )
+                    )
+                }
+                if (asgn1.employee_id, asgn2.date) in approved_leaves:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Cannot apply swap: {asgn1.employee_id} has approved leave on {asgn2.date}",
+                    )
+                if (asgn2.employee_id, asgn1.date) in approved_leaves:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Cannot apply swap: {asgn2.employee_id} has approved leave on {asgn1.date}",
+                    )
+
             s.status = decision_status
             s.manager_decision_by = payload.decision_by
             s.manager_decision_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
@@ -332,13 +423,12 @@ def decide_swap(swap_id: str, payload: SwapDecisionRequest):
 
             if decision_status == SwapStatus.APPLIED:
                 # Execute the shift exchange
-                if s.requester_assignment_id in asgn_map and s.target_assignment_id in asgn_map:
-                    asgn1 = asgn_map[s.requester_assignment_id]
-                    asgn2 = asgn_map[s.target_assignment_id]
-                    # Swap assigned employees
-                    asgn1.employee_id, asgn2.employee_id = asgn2.employee_id, asgn1.employee_id
-                    asgn1.status = AssignmentStatus.SWAPPED
-                    asgn2.status = AssignmentStatus.SWAPPED
+                asgn1 = asgn_map[s.requester_assignment_id]
+                asgn2 = asgn_map[s.target_assignment_id]
+                # Swap assigned employees
+                asgn1.employee_id, asgn2.employee_id = asgn2.employee_id, asgn1.employee_id
+                asgn1.status = AssignmentStatus.SWAPPED
+                asgn2.status = AssignmentStatus.SWAPPED
 
             return s.to_dict()
 

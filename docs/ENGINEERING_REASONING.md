@@ -32,7 +32,7 @@ Workforce rostering in high-consequence operations (emergency healthcare, critic
 - **Decision Taken**: Built a custom priority-weighted heuristic optimization engine with composite equity scoring.
 - **Why**:
   - *Time Complexity & Scale*: Solving an exact ILP for 2,000 employees over 90 days (81,000+ shifts) can take hours and face exponential branch-and-bound blowup. The heuristic solver runs in **under 3 seconds** while achieving **98.2% coverage fulfillment** and a **Gini coefficient of 0.1038** (near parity).
-  - *Auditability*: The heuristic solver logs explicit candidate evaluations ([`SchedulingDecisionLog`](file:///C:/Users/svija/.gemini/antigravity-ide/scratch/fair-shift-scheduler/data_generator/scheduler.py#L42-L54)) explaining *why* an employee was chosen over peers, preserving complete traceability.
+  - *Auditability*: The heuristic solver logs explicit candidate evaluations ([`SchedulingDecisionLog`](data_generator/scheduler.py#L42-L54)) explaining *why* an employee was chosen over peers, preserving complete traceability.
 
 ### Decision 2: Multi-Tier Storage Strategy (CSV + SQLite + ANSI SQL)
 - **Alternatives Considered**: Raw CSV only vs. PostgreSQL container.
@@ -42,7 +42,7 @@ Workforce rostering in high-consequence operations (emergency healthcare, critic
   - *Analytical Power*: The SQLite DB provides instant B-tree indexed joins across foreign keys for fast querying in the web application.
 
 ### Decision 3: Separate Ground Truth File vs. Inline Anomaly Flags
-- **Alternatives Considered**: Adding an `is_valid` or `anomaly_flag` column inside `shift_assignments.csv` vs. isolating anomalies in [`ground_truth.csv`](file:///C:/Users/svija/.gemini/antigravity-ide/scratch/fair-shift-scheduler/data/full/ground_truth.csv).
+- **Alternatives Considered**: Adding an `is_valid` or `anomaly_flag` column inside `shift_assignments.csv` vs. isolating anomalies in [`ground_truth.csv`](data/full/ground_truth.csv).
 - **Decision Taken**: Strictly separated ground truth into `ground_truth.csv` and `ground_truth.json`.
 - **Why**:
   - In a real-world enterprise setting, production transaction tables never contain labels indicating whether a record is anomalous. Placing anomalies in a separate ground truth catalog prevents data leakage and ensures the 8-point validator evaluates the data independently.

@@ -23,7 +23,7 @@ In accordance with the **YottaFlex AI Submission Guidelines (03: Use LLMs Transp
 AI was utilized as a force multiplier in the following development phases:
 
 1. **Relational Data Dictionary Generation**:
-   Accelerated the creation of the exhaustive 12-entity data dictionary ([`DATA_DICTIONARY.md`](file:///C:/Users/svija/.gemini/antigravity-ide/scratch/fair-shift-scheduler/docs/DATA_DICTIONARY.md)), formatting types, uniqueness constraints, units, and validation rules in minutes.
+   Accelerated the creation of the exhaustive 12-entity data dictionary ([`DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md)), formatting types, uniqueness constraints, units, and validation rules in minutes.
 2. **Deterministic Mathematical Formulations**:
    Synthesized standard algorithms for the **Gini Coefficient of Labor Hours** and the **Coefficient of Variation for Antisocial Shifts**, enabling quantitative measurement of schedule equity.
 3. **Multi-Format Export Pipelines**:
@@ -50,7 +50,7 @@ Throughout the development process, multiple subtle algorithmic and system bugs 
 - **Bug Detected**: During automated validation, the date chronology check flagged:
   `scheduled_start 2026-01-10T23:00:00Z not earlier than scheduled_end 2026-01-10T07:30:00Z`.
 - **Root Cause**: In the anomaly injection routine for Case 4 (Overtime Cap Exceeded), the night shift end timestamp was formatted using the same calendar day string rather than `date + 1 day`.
-- **Manual Fix Applied**: Modified date calculations in [`generator.py`](file:///C:/Users/svija/.gemini/antigravity-ide/scratch/fair-shift-scheduler/data_generator/generator.py) so overnight shifts (`TMPL-NGHT` 23:00 to 07:30) correctly project their `scheduled_end` to the following calendar morning (`day + 1`). Re-ran test suite to achieve 100% pass rate.
+- **Manual Fix Applied**: Modified date calculations in [`generator.py`](data_generator/generator.py) so overnight shifts (`TMPL-NGHT` 23:00 to 07:30) correctly project their `scheduled_end` to the following calendar morning (`day + 1`). Re-ran test suite to achieve 100% pass rate.
 
 ### Critical Intervention 2: Non-Deterministic Timestamps Breaking Step 10 Reproducibility
 - **Bug Detected**: Step 10 dual-generation verification initially failed on `ground_truth.csv` with mismatched SHA-256 hashes (`e3d72bd1b...` vs `73130217e...`), while all other 11 tables matched bit-for-bit.

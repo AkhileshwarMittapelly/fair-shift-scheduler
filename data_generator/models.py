@@ -35,6 +35,9 @@ class ShiftCode(str, Enum):
     B = "B"  # Afternoon / Evening (15:00 - 23:30)
     C = "C"  # Night (23:00 - 07:30)
 
+    def __str__(self) -> str:
+        return self.value
+
 
 class LeaveType(str, Enum):
     ANNUAL = "ANNUAL"
@@ -261,6 +264,34 @@ class GroundTruthAnomaly:
     injected_timestamp: str
     severity: str  # "CRITICAL", "HIGH", "MEDIUM"
     expected_detection_rule: str
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class LeaveStateTransitionEvent:
+    event_id: str  # LSTE-2026-000001
+    leave_id: str  # FK: LeaveRequest.leave_id
+    from_status: Optional[str]
+    to_status: str
+    changed_by: str  # Employee ID
+    timestamp: str  # ISO8601
+    notes: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class SwapStateTransitionEvent:
+    event_id: str  # SSTE-2026-000001
+    swap_id: str  # FK: SwapRequest.swap_id
+    from_status: Optional[str]
+    to_status: str
+    changed_by: str  # Employee ID
+    timestamp: str  # ISO8601
+    notes: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

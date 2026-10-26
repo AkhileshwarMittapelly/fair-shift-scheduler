@@ -9,11 +9,11 @@
     "lifecycle_transitions": true,
     "duplicate_checks": true,
     "total_issues_logged": 0,
-    "total_anomalies_detected": 14,
+    "total_anomalies_detected": 8,
     "ground_truth_count": 5,
-    "detection_precision": 1.0,
+    "detection_precision": 0.625,
     "detection_recall": 1.0,
-    "detection_f1_score": 1.0
+    "detection_f1_score": 0.7692
   },
   "structural_integrity": {
     "pk_uniqueness": true,
@@ -28,32 +28,32 @@
       "check_name": "DOUBLE_BOOKING_DETECTION",
       "severity": "ANOMALY_DETECTED",
       "entity_type": "ShiftAssignment",
-      "entity_id": "SHIFT-2026-01-01-ShiftCode.A-000001",
-      "message": "Employee EMP-000051 double-booked with 2 shifts on 2026-01-01 (SHIFT-2026-01-01-ShiftCode.A-000001, SHIFT-2026-01-01-B-999001)",
+      "entity_id": "SHIFT-2026-01-01-A-000001",
+      "message": "Employee EMP-000051 double-booked with 2 shifts on 2026-01-01 (SHIFT-2026-01-01-A-000001, SHIFT-2026-01-01-B-999001)",
       "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS"
     },
     {
       "check_name": "DOUBLE_BOOKING_DETECTION",
       "severity": "ANOMALY_DETECTED",
       "entity_type": "ShiftAssignment",
-      "entity_id": "SHIFT-2026-01-01-ShiftCode.A-000006",
-      "message": "Employee EMP-000002 double-booked with 2 shifts on 2026-01-01 (SHIFT-2026-01-01-ShiftCode.A-000006, SHIFT-2026-01-01-ShiftCode.A-000007)",
+      "entity_id": "SHIFT-2026-01-01-A-000006",
+      "message": "Employee EMP-000002 double-booked with 2 shifts on 2026-01-01 (SHIFT-2026-01-01-A-000006, SHIFT-2026-01-01-A-000007)",
       "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS"
     },
     {
       "check_name": "DOUBLE_BOOKING_DETECTION",
       "severity": "ANOMALY_DETECTED",
       "entity_type": "ShiftAssignment",
-      "entity_id": "SHIFT-2026-01-08-ShiftCode.C-000312",
-      "message": "Employee EMP-000003 double-booked with 2 shifts on 2026-01-08 (SHIFT-2026-01-08-ShiftCode.C-000312, SHIFT-2026-01-08-C-999003)",
+      "entity_id": "SHIFT-2026-01-08-C-000312",
+      "message": "Employee EMP-000003 double-booked with 2 shifts on 2026-01-08 (SHIFT-2026-01-08-C-000312, SHIFT-2026-01-08-C-999003)",
       "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS"
     },
     {
       "check_name": "DOUBLE_BOOKING_DETECTION",
       "severity": "ANOMALY_DETECTED",
       "entity_type": "ShiftAssignment",
-      "entity_id": "SHIFT-2026-01-10-ShiftCode.C-000404",
-      "message": "Employee EMP-000003 double-booked with 2 shifts on 2026-01-10 (SHIFT-2026-01-10-ShiftCode.C-000404, SHIFT-2026-01-10-C-999005)",
+      "entity_id": "SHIFT-2026-01-10-C-000404",
+      "message": "Employee EMP-000003 double-booked with 2 shifts on 2026-01-10 (SHIFT-2026-01-10-C-000404, SHIFT-2026-01-10-C-999005)",
       "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS"
     },
     {
@@ -68,8 +68,8 @@
       "check_name": "SKILL_ABSENCE_DETECTION",
       "severity": "ANOMALY_DETECTED",
       "entity_type": "ShiftAssignment",
-      "entity_id": "SHIFT-2026-01-01-ShiftCode.A-000006",
-      "message": "Shift SHIFT-2026-01-01-ShiftCode.A-000006 mandates skill SKILL-01 but assigned employee EMP-000002 lacks credential",
+      "entity_id": "SHIFT-2026-01-01-A-000006",
+      "message": "Shift SHIFT-2026-01-01-A-000006 mandates skill SKILL-01 but assigned employee EMP-000002 lacks credential",
       "rule_code": "RULE_MANDATORY_ROLE_SKILL_MATCH"
     },
     {
@@ -84,54 +84,6 @@
       "check_name": "UNAPPROVED_SWAP_DETECTION",
       "severity": "ANOMALY_DETECTED",
       "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000012",
-      "message": "Swap SWP-2026-000012 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000013",
-      "message": "Swap SWP-2026-000013 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000014",
-      "message": "Swap SWP-2026-000014 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000015",
-      "message": "Swap SWP-2026-000015 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000018",
-      "message": "Swap SWP-2026-000018 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
-      "entity_id": "SWP-2026-000020",
-      "message": "Swap SWP-2026-000020 has APPLIED status but lacks required manager authorization signoff",
-      "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
-    },
-    {
-      "check_name": "UNAPPROVED_SWAP_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "SwapRequest",
       "entity_id": "SWP-2026-999001",
       "message": "Swap SWP-2026-999001 has APPLIED status but lacks required manager authorization signoff",
       "rule_code": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL"
@@ -140,41 +92,66 @@
   "ground_truth_evaluation": {
     "total_ground_truth": 5,
     "true_positives": 5,
-    "false_positives": 0,
+    "false_positives": 3,
     "false_negatives": 0,
-    "precision": 1.0,
+    "precision": 0.625,
     "recall": 1.0,
-    "f1_score": 1.0,
+    "f1_score": 0.7692,
     "breakdown": [
       {
         "ground_truth_id": "GT-000001",
         "rule": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
         "status": "DETECTED_TRUE_POSITIVE",
-        "entity_id": "SHIFT-2026-01-01-ShiftCode.A-000001"
+        "entity_id": "SHIFT-2026-01-01-A-000001",
+        "matched_on": "SHIFT-2026-01-01-A-000001"
       },
       {
         "ground_truth_id": "GT-000002",
         "rule": "RULE_APPROVED_LEAVE_NON_CONFLICT",
         "status": "DETECTED_TRUE_POSITIVE",
-        "entity_id": "SHIFT-2026-01-12-A-999002"
+        "entity_id": "SHIFT-2026-01-12-A-999002",
+        "matched_on": "SHIFT-2026-01-12-A-999002"
       },
       {
         "ground_truth_id": "GT-000003",
         "rule": "RULE_MANDATORY_ROLE_SKILL_MATCH",
         "status": "DETECTED_TRUE_POSITIVE",
-        "entity_id": "SHIFT-2026-01-01-ShiftCode.A-000006"
+        "entity_id": "SHIFT-2026-01-01-A-000006",
+        "matched_on": "SHIFT-2026-01-01-A-000006"
       },
       {
         "ground_truth_id": "GT-000004",
         "rule": "RULE_MAX_WEEKLY_LABOR_AND_OVERTIME_CAP",
         "status": "DETECTED_TRUE_POSITIVE",
-        "entity_id": "EMP-000003"
+        "entity_id": "EMP-000003",
+        "matched_on": "EMP-000003"
       },
       {
         "ground_truth_id": "GT-000005",
         "rule": "RULE_SWAP_REQUIRES_MANAGER_APPROVAL",
         "status": "DETECTED_TRUE_POSITIVE",
-        "entity_id": "SWP-2026-999001"
+        "entity_id": "SWP-2026-999001",
+        "matched_on": "SWP-2026-999001"
+      }
+    ],
+    "incidental_baseline_violations": [
+      {
+        "entity_id": "SHIFT-2026-01-01-A-000006",
+        "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
+        "message": "Employee EMP-000002 double-booked with 2 shifts on 2026-01-01 (SHIFT-2026-01-01-A-000006, SHIFT-2026-01-01-A-000007)",
+        "classification": "INCIDENTAL_BASELINE_VIOLATION"
+      },
+      {
+        "entity_id": "SHIFT-2026-01-08-C-000312",
+        "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
+        "message": "Employee EMP-000003 double-booked with 2 shifts on 2026-01-08 (SHIFT-2026-01-08-C-000312, SHIFT-2026-01-08-C-999003)",
+        "classification": "INCIDENTAL_BASELINE_VIOLATION"
+      },
+      {
+        "entity_id": "SHIFT-2026-01-10-C-000404",
+        "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
+        "message": "Employee EMP-000003 double-booked with 2 shifts on 2026-01-10 (SHIFT-2026-01-10-C-000404, SHIFT-2026-01-10-C-999005)",
+        "classification": "INCIDENTAL_BASELINE_VIOLATION"
       }
     ]
   },

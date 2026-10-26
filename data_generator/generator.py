@@ -630,7 +630,8 @@ class SyntheticDataGenerator:
                             break
 
                         # Deterministic assignment ID
-                        asgn_id = f"SHIFT-{date_str}-{tmpl.shift_code}-{assignment_counter:06d}"
+                        shift_letter = tmpl.shift_code.value if hasattr(tmpl.shift_code, "value") else str(tmpl.shift_code)
+                        asgn_id = f"SHIFT-{date_str}-{shift_letter}-{assignment_counter:06d}"
                         assignment_counter += 1
 
                         # Compute start & end timestamps
@@ -678,7 +679,7 @@ class SyntheticDataGenerator:
             return swaps
 
         num_swaps = min(200 if self.scale == "full" else 20, len(assignments) // 4)
-        manager_id = "EMP-000001"
+        default_manager_id = "EMP-000001"
 
         # Group assignments by date for easy peer swap finding
         asgn_by_date: Dict[str, List[ShiftAssignment]] = {}
@@ -703,22 +704,26 @@ class SyntheticDataGenerator:
 
             req_time = f"{date_choice}T08:00:00Z"
             peer_time = f"{date_choice}T08:30:00Z"
-            mgr_time = f"{date_choice}T09:15:00Z"
 
-            # 70% APPLIED (Approved and executed), 15% REJECTED, 15% PENDING_MANAGER
+            # Use iteration-local variables to avoid scoping bug where PENDING_MANAGER
+            # overwrites the outer manager_id, affecting all subsequent loop iterations.
             outcome = self.rng.random()
             if outcome < 0.70:
                 status = SwapStatus.APPLIED
+                cur_manager_id = default_manager_id
+                mgr_time: Optional[str] = f"{date_choice}T09:15:00Z"
                 asgn1.status = AssignmentStatus.SWAPPED
                 asgn2.status = AssignmentStatus.SWAPPED
-                notes = "Swap verified: Skills and working hour constraints satisfied."
+                notes: Optional[str] = "Swap verified: Skills and working hour constraints satisfied."
             elif outcome < 0.85:
                 status = SwapStatus.REJECTED
+                cur_manager_id = default_manager_id
+                mgr_time = f"{date_choice}T09:15:00Z"
                 notes = "Swap rejected: Consecutive rest period violation detected."
             else:
                 status = SwapStatus.PENDING_MANAGER
+                cur_manager_id = None
                 mgr_time = None
-                manager_id = None
                 notes = None
 
             swaps.append(
@@ -731,7 +736,7 @@ class SyntheticDataGenerator:
                     status=status,
                     requested_at=req_time,
                     peer_agreed_at=peer_time,
-                    manager_decision_by=manager_id,
+                    manager_decision_by=cur_manager_id,
                     manager_decision_at=mgr_time,
                     decision_notes=notes,
                 )

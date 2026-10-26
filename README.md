@@ -173,9 +173,9 @@ Open your browser to: **`http://localhost:8000`**
 
 ## 9. Documentation Index
 
-- [Data Dictionary (Step 1)](file:///C:/Users/svija/.gemini/antigravity-ide/scratch/fair-shift-scheduler/docs/DATA_DICTIONARY.md) — Exhaustive field types, allowed values, units, uniqueness, and validation rules.
-- [Architecture & Solution Blueprint](file:///C:/Users/svija/.gemini/antigravity-ide/scratch/fair-shift-scheduler/docs/ARCHITECTURE.md) — Detailed ER diagrams, constraint solver mathematics, and actor sequence diagrams.
-- [REST API Specification](file:///C:/Users/svija/.gemini/antigravity-ide/scratch/fair-shift-scheduler/docs/API_SPECIFICATION.md) — Endpoint contracts, schemas, and payloads.
+- [Data Dictionary (Step 1)](docs/DATA_DICTIONARY.md) — Exhaustive field types, allowed values, units, uniqueness, and validation rules.
+- [Architecture & Solution Blueprint](docs/ARCHITECTURE.md) — Detailed ER diagrams, constraint solver mathematics, and actor sequence diagrams.
+- [REST API Specification](docs/API_SPECIFICATION.md) — Endpoint contracts, schemas, and payloads.
 
 ---
 

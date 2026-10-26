@@ -643,47 +643,90 @@ class DatasetValidator:
     # -------------------------------------------------------------------------
     def _evaluate_ground_truth(self) -> Dict[str, Any]:
         """
-        Benchmarks detected anomalies against ground_truth_anomalies.
-        Calculates True Positives, False Positives, False Negatives, Precision, Recall, F1.
+        Benchmarks detected anomalies against ground_truth_anomalies at the
+        individual ENTITY-INSTANCE level.
+
+        A detection is counted as a True Positive only when BOTH conditions hold:
+          1. The detection's rule_code == gt.expected_detection_rule
+          2. The detection's entity_id == gt.primary_entity_id
+             OR (for double-bookings) the detection's entity_id is the
+             secondary_entity_id recorded in the ground truth.
+
+        This prevents a detection of a *different* record from receiving credit
+        for the labelled ground-truth case even when they share the same rule.
         """
         gt_list = self.dataset.ground_truth_anomalies
-        gt_rule_map: Dict[str, GroundTruthAnomaly] = {
-            gt.expected_detection_rule: gt for gt in gt_list
-        }
 
-        detected_rule_codes = {d.rule_code for d in self.detected_anomalies}
+        # Build a set of (entity_id, rule_code) tuples from all detections
+        detection_pairs: Set[Tuple[str, str]] = set()
+        for d in self.detected_anomalies:
+            detection_pairs.add((d.entity_id, d.rule_code))
+
+        # Also record the set of ground-truth (entity_id, rule) pairs so we can
+        # separate incidental violations from the injected anomalies.
+        gt_entity_rule_pairs: Set[Tuple[str, str]] = set()
 
         tp = 0
         fn = 0
-        fp = 0
-
         matched_details = []
 
         for gt in gt_list:
-            if gt.expected_detection_rule in detected_rule_codes:
+            rule = gt.expected_detection_rule
+            primary_hit = (gt.primary_entity_id, rule) in detection_pairs
+            secondary_hit = (
+                gt.secondary_entity_id is not None
+                and (gt.secondary_entity_id, rule) in detection_pairs
+            )
+
+            # Track all entity IDs belonging to this ground truth entry
+            gt_entity_rule_pairs.add((gt.primary_entity_id, rule))
+            if gt.secondary_entity_id:
+                gt_entity_rule_pairs.add((gt.secondary_entity_id, rule))
+
+            if primary_hit or secondary_hit:
                 tp += 1
+                matched_entity = gt.primary_entity_id if primary_hit else gt.secondary_entity_id
                 matched_details.append({
                     "ground_truth_id": gt.anomaly_id,
-                    "rule": gt.expected_detection_rule,
+                    "rule": rule,
                     "status": "DETECTED_TRUE_POSITIVE",
                     "entity_id": gt.primary_entity_id,
+                    "matched_on": matched_entity,
                 })
             else:
                 fn += 1
                 matched_details.append({
                     "ground_truth_id": gt.anomaly_id,
-                    "rule": gt.expected_detection_rule,
+                    "rule": rule,
                     "status": "MISSED_FALSE_NEGATIVE",
                     "entity_id": gt.primary_entity_id,
+                    "matched_on": None,
                 })
 
+        # Count False Positives: detections whose (entity_id, rule_code) pair
+        # does NOT match any ground-truth entry. These are incidental violations
+        # found in the baseline data, not the deliberately injected anomalies.
+        gt_rules: Set[str] = {gt.expected_detection_rule for gt in gt_list}
+        fp = 0
+        incidental_violations = []
         for det in self.detected_anomalies:
-            if det.rule_code not in gt_rule_map:
+            pair = (det.entity_id, det.rule_code)
+            if pair not in gt_entity_rule_pairs:
                 fp += 1
+                incidental_violations.append({
+                    "entity_id": det.entity_id,
+                    "rule_code": det.rule_code,
+                    "message": det.message,
+                    "classification": (
+                        "INCIDENTAL_BASELINE_VIOLATION"
+                        if det.rule_code in gt_rules
+                        else "UNRELATED_DETECTION"
+                    ),
+                })
 
         precision = tp / (tp + fp) if (tp + fp) > 0 else 1.0
         recall = tp / (tp + fn) if (tp + fn) > 0 else 1.0
-        f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 1.0
+        f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
 
         return {
             "total_ground_truth": len(gt_list),
@@ -694,4 +737,5 @@ class DatasetValidator:
             "recall": round(recall, 4),
             "f1_score": round(f1, 4),
             "breakdown": matched_details,
+            "incidental_baseline_violations": incidental_violations,
         }
