@@ -144,7 +144,7 @@ class FairShiftScheduler:
 
         # State tracking structures
         emp_assignments_by_date: Dict[Tuple[str, str], ShiftAssignment] = {}  # (emp_id, date) -> ShiftAssignment
-        emp_weekly_hours: Dict[Tuple[str, int], float] = {}  # (emp_id, week_num) -> total hours
+        emp_weekly_hours: Dict[Tuple[str, Tuple[int, int]], float] = {}  # (emp_id, (ISO year, ISO week)) -> total hours
         emp_night_shifts: Dict[str, int] = {e.employee_id: 0 for e in self.employees}
         emp_weekend_shifts: Dict[str, int] = {e.employee_id: 0 for e in self.employees}
         emp_consecutive_days: Dict[str, int] = {e.employee_id: 0 for e in self.employees}
@@ -170,7 +170,8 @@ class FairShiftScheduler:
         for day_offset in range(num_days):
             current_date = start_date + datetime.timedelta(days=day_offset)
             date_str = current_date.isoformat()
-            week_num = current_date.isocalendar()[1]
+            iso_calendar = current_date.isocalendar()
+            week_key = (iso_calendar.year, iso_calendar.week)
             is_weekend = current_date.weekday() >= 5
 
             day_reqs = reqs_by_date.get(date_str, [])
@@ -230,7 +231,7 @@ class FairShiftScheduler:
                             continue
 
                     # HARD CONSTRAINT 6: Weekly labor and overtime cap
-                    current_weekly_hrs = emp_weekly_hours.get((emp.employee_id, week_num), 0.0)
+                    current_weekly_hrs = emp_weekly_hours.get((emp.employee_id, week_key), 0.0)
                     max_allowed_hrs = emp.contract_hours_per_week + emp.max_weekly_overtime_hours
                     if current_weekly_hrs + tmpl.duration_hours > max_allowed_hrs:
                         continue
@@ -281,8 +282,8 @@ class FairShiftScheduler:
 
                     # Update solver state
                     emp_assignments_by_date[(emp.employee_id, date_str)] = asgn
-                    emp_weekly_hours[(emp.employee_id, week_num)] = (
-                        emp_weekly_hours.get((emp.employee_id, week_num), 0.0) + tmpl.duration_hours
+                    emp_weekly_hours[(emp.employee_id, week_key)] = (
+                        emp_weekly_hours.get((emp.employee_id, week_key), 0.0) + tmpl.duration_hours
                     )
                     emp_last_shift_end[emp.employee_id] = s_end
                     emp_consecutive_days[emp.employee_id] += 1
@@ -301,7 +302,7 @@ class FairShiftScheduler:
                             shift_code=tmpl.shift_code.value,
                             assigned_employee_id=emp.employee_id,
                             candidates_evaluated=len(evaluated_candidates),
-                            rationale=f"Selected candidate with best equity score {score:.2f} (Weekly Load: {emp_weekly_hours[(emp.employee_id, week_num)]:.1f}h)",
+                            rationale=f"Selected candidate with best equity score {score:.2f} (Weekly Load: {emp_weekly_hours[(emp.employee_id, week_key)]:.1f}h)",
                             selected_rank_score=round(score, 4),
                         )
                     )
@@ -344,7 +345,7 @@ class FairShiftScheduler:
         coverage_requirements: List[CoverageRequirement],
         assignments: List[ShiftAssignment],
         coverage_gaps: List[CoverageRequirement],
-        emp_weekly_hours: Dict[Tuple[str, int], float],
+        emp_weekly_hours: Dict[Tuple[str, Tuple[int, int]], float],
         emp_night_shifts: Dict[str, int],
         emp_weekend_shifts: Dict[str, int],
     ) -> SchedulingMetrics:
