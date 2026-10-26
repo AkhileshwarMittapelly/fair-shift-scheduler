@@ -94,3 +94,7 @@ Throughout the development process, multiple subtle algorithmic and system bugs 
 ### Summary 6: Packaging, Documentation & GitHub Remote Deployment
 > *"Push code to a public GitHub repository and add README explaining how to run it."*
 - **Action Taken**: Resolved GitHub 100MB file limit, authored exhaustive `README.md`, `DATA_DICTIONARY.md`, and `ARCHITECTURE.md`, committed all code, and pushed to `https://github.com/AkhileshwarMittapelly/fair-shift-scheduler`.
+
+### Summary 7: Technical Repair & Handover (CI Failure, Timestamp Overlap & 1-to-1 Evaluation)
+> *"Investigate CI failure in test_ground_truth_detection_accuracy (precision 0.2174 too low), trace incidental baseline violations, fix baseline generator cross-midnight overlaps, implement 1-to-1 instance-aware ground truth matching, and add regression tests."*
+- **Action Taken**: Diagnosed 15 incidental baseline violations to `_generate_baseline_schedules` lacking timestamp interval check; added interval overlap tracking in generator; implemented `_matches_ground_truth` and strict 1-to-1 instance evaluation in `validator.py`; added 9 comprehensive regression test suites in `tests/test_validator.py` (34 total tests passing, precision restored to 0.625); pushed to GitHub branch `fix/timestamp-based-shift-overlap`.
