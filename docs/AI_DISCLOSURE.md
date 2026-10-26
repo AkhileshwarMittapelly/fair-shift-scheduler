@@ -5,7 +5,7 @@
 
 ## 1. Executive Summary & AI Usage Philosophy
 
-In accordance with the **YottaFlex AI Submission Guidelines (03: Use LLMs Transparently)**, this document provides an honest, comprehensive disclosure of how AI (specifically Google's Antigravity AI pair programmer powered by Gemini 3.8 Flash) was utilized throughout the project lifecycle.
+In accordance with the **YottaFlex AI Submission Guidelines (03: Use LLMs Transparently)**, this document describes AI-assisted work and human review. Important completeness note: the prompt section below is a reconstructed summary of key prompts, not a verified exhaustive export of every prompt submitted to every AI tool. Before submission, the candidate must add the actual remaining prompts from each tool's history where available and clearly identify any unavailable history.
 
 | Area of Work | AI Acceleration Factor | Human Judgment & Validation Applied |
 | :--- | :--- | :--- |
@@ -13,7 +13,7 @@ In accordance with the **YottaFlex AI Submission Guidelines (03: Use LLMs Transp
 | **Synthetic Data Generation Engine** | **High**: Procedural generation logic across master, transaction, and telemetry tables. | Tested edge-case boundaries, scale parameterization (starter 100 vs. full 2,000 employees), and deterministic RNG seeding. |
 | **Labelled Anomaly Injection** | **Medium**: Boilerplate creation for 5 error scenarios. | Hand-validated that ground truth remains strictly isolated and never leaks into features or operational inputs. |
 | **Constraint Solver & Fairness Math** | **High**: Drafting heuristic ranking function and Gini coefficient math. | Designed multi-objective equity formulas (night shift equity, weekend shift equity, 11h rest constraints). |
-| **Validation Engine & Benchmarks** | **High**: Scaffolding the 8-point validation checks. | Personally debugged detection precision and recall to achieve 100% F1-score across all 5 edge cases. |
+| **Validation Engine & Benchmarks** | **High**: Scaffolding the 8-point validation checks. | Reviewed detection precision and recall against injected edge cases; benchmark values must be taken from the current generated validation report, including any false positives and false negatives. |
 | **Full-Stack Web Dashboard** | **High**: React components and custom glassmorphic CSS design system. | Tested all 5 actor workflows (Employee, Manager, HR, IT/Ops, SysAdmin) and interactive modals. |
 
 ---
@@ -67,30 +67,30 @@ Throughout the development process, multiple subtle algorithmic and system bugs 
 
 ---
 
-## 5. Chronological Prompt & Iteration History
+## 5. Reconstructed Prompt & Iteration Summary
 
-Below is the chronological record of key prompts and instructions driving the build:
+**Completeness status: partial / not yet verified exhaustive.** The six entries below summarize key instructions and may be paraphrased; they must not be treated as a complete verbatim prompt log. YottaFlex's FAQ asks candidates to include all prompts submitted to every AI tool used. Add the remaining actual prompts from Antigravity and any other AI tools used, in chronological order, before submission. If a tool cannot export prompts, record the limitation and preserve the best available record, as permitted by the FAQ.
 
-### Prompt 1: Requirements Ingestion & Architecture Planning
+### Summary 1: Requirements Ingestion & Architecture Planning
 > *"Problem statement: Combine leave requests, shift coverage, skills and labor constraints to create fair and feasible schedules... Build an end-to-end working solution covering all 10 synthetic data generation steps, 5 primary actors, 5 labelled edge cases, 8-point validator, Step 10 reproducibility, and an interactive web app."*
 - **Action Taken**: Analyzed requirements, planned 12 core dataclasses, established architecture blueprint, and initialized Git repository.
 
-### Prompt 2: Core Domain Models & Generator Implementation
+### Summary 2: Core Domain Models & Generator Implementation
 > *"Implement master data first, deterministic IDs (EMP-000001, SHIFT-YYYY-MM-DD-<Code>), 90 days of shifts, 2000 employees, 5000 leaves, and inject 5 labelled edge cases."*
 - **Action Taken**: Authored `models.py`, `generator.py`, and `export.py`. Generated both Starter and Full datasets with fixed seed `20261022`.
 
-### Prompt 3: Step 8 Validator & Anomaly Benchmarking
+### Summary 3: Step 8 Validator & Anomaly Benchmarking
 > *"Implement 8-point validator checking PK uniqueness, FK integrity, enums, dates, arithmetic reconciliation, lifecycle transitions, and ground truth benchmark."*
-- **Action Taken**: Authored `validator.py`. Executed benchmark: achieved 100% Precision, 100% Recall, and 1.0 F1-score across all 5 injected anomalies.
+- **Action Taken**: Authored `validator.py`. The current benchmark must be rerun and its measured precision, recall, F1-score, false positives, and false negatives recorded here; no perfect score is claimed without reproducible evidence.
 
-### Prompt 4: Step 10 Bit-for-Bit Reproducibility Verification
+### Summary 4: Step 10 Bit-for-Bit Reproducibility Verification
 > *"Regenerate twice with the same seed and compare row counts/checksums to demonstrate reproducibility."*
 - **Action Taken**: Authored `reproducibility.py`. Diagnosed and resolved non-deterministic timestamp bug; achieved bit-for-bit SHA-256 match.
 
-### Prompt 5: Full-Stack Web Application & API
+### Summary 5: Full-Stack Web Application & API
 > *"Build working solution exposing key decisions and exceptions for Employee, Manager, HR Partner, IT/Ops, and SysAdmin."*
 - **Action Taken**: Implemented FastAPI backend (`server/app.py`) and Vite + React frontend (`client/src/App.jsx`) with custom glassmorphic CSS design system (`client/src/index.css`).
 
-### Prompt 6: Packaging, Documentation & GitHub Remote Deployment
+### Summary 6: Packaging, Documentation & GitHub Remote Deployment
 > *"Push code to a public GitHub repository and add README explaining how to run it."*
 - **Action Taken**: Resolved GitHub 100MB file limit, authored exhaustive `README.md`, `DATA_DICTIONARY.md`, and `ARCHITECTURE.md`, committed all code, and pushed to `https://github.com/AkhileshwarMittapelly/fair-shift-scheduler`.
