@@ -673,77 +673,89 @@ class DatasetValidator:
     # -------------------------------------------------------------------------
     # Evaluation Matrix Against Ground Truth
     # -------------------------------------------------------------------------
+    def _matches_ground_truth(self, det: ValidationIssue, gt: GroundTruthAnomaly) -> bool:
+        """
+        Determines whether a detected violation corresponds to an expected
+        ground-truth anomaly at the individual entity and rule level.
+        """
+        if det.rule_code != gt.expected_detection_rule:
+            return False
+
+        # Pairwise shift overlap matching: both primary and secondary entity IDs must match
+        if det.rule_code == "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS":
+            if det.entity_id == gt.primary_entity_id:
+                return gt.secondary_entity_id is None or gt.secondary_entity_id in det.message
+            elif gt.secondary_entity_id and det.entity_id == gt.secondary_entity_id:
+                return gt.primary_entity_id in det.message
+            return False
+
+        # Single-entity or primary entity matching
+        if det.entity_id == gt.primary_entity_id:
+            return True
+
+        # Secondary entity fallback matching
+        if gt.secondary_entity_id and det.entity_id == gt.secondary_entity_id:
+            return True
+
+        return False
+
     def _evaluate_ground_truth(self) -> Dict[str, Any]:
         """
         Benchmarks detected anomalies against ground_truth_anomalies at the
-        individual ENTITY-INSTANCE level.
+        individual ENTITY-INSTANCE level using strict 1-to-1 matching.
 
-        A detection is counted as a True Positive only when BOTH conditions hold:
-          1. The detection's rule_code == gt.expected_detection_rule
-          2. The detection's entity_id == gt.primary_entity_id
-             OR (for double-bookings) the detection's entity_id is the
-             secondary_entity_id recorded in the ground truth.
+        A detection is counted as a True Positive only when it matches an expected
+        ground-truth anomaly on rule code and affected entity identifier(s).
+        Each detection satisfies at most one ground-truth entry, and each ground-truth
+        entry is satisfied by at most one detection.
 
-        This prevents a detection of a *different* record from receiving credit
-        for the labelled ground-truth case even when they share the same rule.
+        Unmatched ground-truth entries are counted as False Negatives.
+        Unmatched detections are counted as False Positives (separated into
+        incidental baseline violations and unrelated detections).
         """
         gt_list = self.dataset.ground_truth_anomalies
-
-        # Build a set of (entity_id, rule_code) tuples from all detections
-        detection_pairs: Set[Tuple[str, str]] = set()
-        for d in self.detected_anomalies:
-            detection_pairs.add((d.entity_id, d.rule_code))
-
-        # Also record the set of ground-truth (entity_id, rule) pairs so we can
-        # separate incidental violations from the injected anomalies.
-        gt_entity_rule_pairs: Set[Tuple[str, str]] = set()
+        matched_detection_indices: Set[int] = set()
 
         tp = 0
         fn = 0
         matched_details = []
 
         for gt in gt_list:
-            rule = gt.expected_detection_rule
-            primary_hit = (gt.primary_entity_id, rule) in detection_pairs
-            secondary_hit = (
-                gt.secondary_entity_id is not None
-                and (gt.secondary_entity_id, rule) in detection_pairs
-            )
+            matched_idx: Optional[int] = None
+            for idx, det in enumerate(self.detected_anomalies):
+                if idx in matched_detection_indices:
+                    continue
+                if self._matches_ground_truth(det, gt):
+                    matched_idx = idx
+                    break
 
-            # Track all entity IDs belonging to this ground truth entry
-            gt_entity_rule_pairs.add((gt.primary_entity_id, rule))
-            if gt.secondary_entity_id:
-                gt_entity_rule_pairs.add((gt.secondary_entity_id, rule))
-
-            if primary_hit or secondary_hit:
+            if matched_idx is not None:
+                matched_detection_indices.add(matched_idx)
                 tp += 1
-                matched_entity = gt.primary_entity_id if primary_hit else gt.secondary_entity_id
+                det = self.detected_anomalies[matched_idx]
                 matched_details.append({
                     "ground_truth_id": gt.anomaly_id,
-                    "rule": rule,
+                    "rule": gt.expected_detection_rule,
                     "status": "DETECTED_TRUE_POSITIVE",
                     "entity_id": gt.primary_entity_id,
-                    "matched_on": matched_entity,
+                    "matched_on": det.entity_id,
                 })
             else:
                 fn += 1
                 matched_details.append({
                     "ground_truth_id": gt.anomaly_id,
-                    "rule": rule,
+                    "rule": gt.expected_detection_rule,
                     "status": "MISSED_FALSE_NEGATIVE",
                     "entity_id": gt.primary_entity_id,
                     "matched_on": None,
                 })
 
-        # Count False Positives: detections whose (entity_id, rule_code) pair
-        # does NOT match any ground-truth entry. These are incidental violations
-        # found in the baseline data, not the deliberately injected anomalies.
+        # Count False Positives: detections that were not matched 1-to-1 to any ground truth entry.
         gt_rules: Set[str] = {gt.expected_detection_rule for gt in gt_list}
         fp = 0
         incidental_violations = []
-        for det in self.detected_anomalies:
-            pair = (det.entity_id, det.rule_code)
-            if pair not in gt_entity_rule_pairs:
+        for idx, det in enumerate(self.detected_anomalies):
+            if idx not in matched_detection_indices:
                 fp += 1
                 incidental_violations.append({
                     "entity_id": det.entity_id,

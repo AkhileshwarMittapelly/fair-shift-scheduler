@@ -582,6 +582,9 @@ class SyntheticDataGenerator:
         # Track weekly hours for employees to maintain fairness and stay within contract limits
         emp_weekly_hours: Dict[Tuple[str, int], float] = {}  # (emp_id, week_num) -> hours
         emp_shift_dates: Dict[str, set] = {e.employee_id: set() for e in employees}
+        emp_assigned_intervals: Dict[str, List[Tuple[datetime.datetime, datetime.datetime]]] = {
+            e.employee_id: [] for e in employees
+        }
 
         for day_offset in range(self.num_days):
             current_date = self.start_date + datetime.timedelta(days=day_offset)
@@ -602,6 +605,18 @@ class SyntheticDataGenerator:
                     tmpl = tmpl_by_id[req.shift_template_id]
                     needed = req.min_headcount
 
+                    start_ts = f"{date_str}T{tmpl.start_time}:00Z"
+                    if tmpl.is_overnight:
+                        next_day = current_date + datetime.timedelta(days=1)
+                        end_ts = f"{next_day.isoformat()}T{tmpl.end_time}:00Z"
+                        next_day_str = next_day.isoformat()
+                    else:
+                        end_ts = f"{date_str}T{tmpl.end_time}:00Z"
+                        next_day_str = None
+
+                    cand_start = datetime.datetime.fromisoformat(start_ts.replace("Z", "+00:00"))
+                    cand_end = datetime.datetime.fromisoformat(end_ts.replace("Z", "+00:00"))
+
                     # Filter available candidates in this team
                     candidates = []
                     for emp in team_members:
@@ -611,12 +626,24 @@ class SyntheticDataGenerator:
                         # Cannot be on approved leave
                         if date_str in emp_leave_dates[emp.employee_id]:
                             continue
+                        # Overnight shift cannot run into an approved leave the following day
+                        if next_day_str and next_day_str in emp_leave_dates[emp.employee_id]:
+                            continue
                         # If requirement specifies a skill, employee must have it
                         if req.skill_id and req.skill_id not in emp_skill_map[emp.employee_id]:
                             continue
                         # Check hours worked this week (keep below contract + 8h)
                         cur_hours = emp_weekly_hours.get((emp.employee_id, week_num), 0.0)
                         if cur_hours + tmpl.duration_hours > emp.contract_hours_per_week + 8.0:
+                            continue
+
+                        # Ensure no timestamp interval overlap with existing assigned shifts [start, end)
+                        has_overlap = False
+                        for prev_start, prev_end in emp_assigned_intervals[emp.employee_id]:
+                            if cand_start < prev_end and prev_start < cand_end:
+                                has_overlap = True
+                                break
+                        if has_overlap:
                             continue
 
                         candidates.append((cur_hours, emp))
@@ -634,14 +661,6 @@ class SyntheticDataGenerator:
                         asgn_id = f"SHIFT-{date_str}-{shift_letter}-{assignment_counter:06d}"
                         assignment_counter += 1
 
-                        # Compute start & end timestamps
-                        start_ts = f"{date_str}T{tmpl.start_time}:00Z"
-                        if tmpl.is_overnight:
-                            next_day = current_date + datetime.timedelta(days=1)
-                            end_ts = f"{next_day.isoformat()}T{tmpl.end_time}:00Z"
-                        else:
-                            end_ts = f"{date_str}T{tmpl.end_time}:00Z"
-
                         asgn = ShiftAssignment(
                             assignment_id=asgn_id,
                             date=date_str,
@@ -658,6 +677,7 @@ class SyntheticDataGenerator:
                         assignments.append(asgn)
 
                         emp_shift_dates[emp.employee_id].add(date_str)
+                        emp_assigned_intervals[emp.employee_id].append((cand_start, cand_end))
                         emp_weekly_hours[(emp.employee_id, week_num)] = (
                             emp_weekly_hours.get((emp.employee_id, week_num), 0.0) + tmpl.duration_hours
                         )
