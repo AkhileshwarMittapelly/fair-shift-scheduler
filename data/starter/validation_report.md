@@ -20,19 +20,17 @@
 
 - **Total Ground Truth Injected**: 5
 - **True Positives**: 5
-- **False Positives**: 2
+- **False Positives**: 0
 - **False Negatives**: 0
-- **Precision**: `71.4%`
+- **Precision**: `100.0%`
 - **Recall**: `100.0%`
-- **F1 Score**: `83.3%`
+- **F1 Score**: `100.0%`
 
 ### Detected Edge Case Anomalies
 
 | Rule Code | Severity | Entity | Entity ID | Issue Message |
 | --- | --- | --- | --- | --- |
 | `RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS` | `ANOMALY_DETECTED` | ShiftAssignment | `SHIFT-2026-01-01-A-000001` | Employee EMP-000051 has overlapping shifts SHIFT-2026-01-01-A-000001 (2026-01-01T07:00:00Z to 2026-01-01T15:30:00Z) and SHIFT-2026-01-01-B-999001 (2026-01-01T15:00:00Z to 2026-01-01T23:30:00Z) |
-| `RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS` | `ANOMALY_DETECTED` | ShiftAssignment | `SHIFT-2026-01-08-C-000312` | Employee EMP-000003 has overlapping shifts SHIFT-2026-01-08-C-000312 (2026-01-08T23:00:00Z to 2026-01-09T07:30:00Z) and SHIFT-2026-01-08-C-999003 (2026-01-08T23:00:00Z to 2026-01-09T07:30:00Z) |
-| `RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS` | `ANOMALY_DETECTED` | ShiftAssignment | `SHIFT-2026-01-10-B-000401` | Employee EMP-000003 has overlapping shifts SHIFT-2026-01-10-B-000401 (2026-01-10T15:00:00Z to 2026-01-10T23:30:00Z) and SHIFT-2026-01-10-C-999005 (2026-01-10T23:00:00Z to 2026-01-11T07:30:00Z) |
 | `RULE_APPROVED_LEAVE_NON_CONFLICT` | `ANOMALY_DETECTED` | ShiftAssignment | `SHIFT-2026-01-12-A-999002` | Shift SHIFT-2026-01-12-A-999002 scheduled for EMP-000078 during approved leave LVE-2026-000001 on 2026-01-12 |
 | `RULE_MANDATORY_ROLE_SKILL_MATCH` | `ANOMALY_DETECTED` | ShiftAssignment | `SHIFT-2026-01-01-A-000006` | Shift SHIFT-2026-01-01-A-000006 mandates skill SKILL-01 but assigned employee EMP-000002 lacks credential |
 | `RULE_MAX_WEEKLY_LABOR_AND_OVERTIME_CAP` | `ANOMALY_DETECTED` | Employee | `EMP-000003` | Employee EMP-000003 scheduled for 56.0h in week 2, exceeding legal cap of 52.0h |

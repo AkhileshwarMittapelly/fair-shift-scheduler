@@ -37,7 +37,7 @@
     "anomaly_type": "OVERTIME_CAP_EXCEEDED",
     "entity_type": "Employee",
     "primary_entity_id": "EMP-000003",
-    "secondary_entity_id": "SHIFT-2026-01-08-C-999003",
+    "secondary_entity_id": "SHIFT-2026-01-05-C-999003",
     "description": "Employee EMP-000003 exceeded maximum statutory weekly overtime limit (scheduled > 52.0h)",
     "injected_timestamp": "2026-01-01T00:00:00Z",
     "severity": "HIGH",

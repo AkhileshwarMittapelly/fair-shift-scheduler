@@ -48,13 +48,53 @@ def test_ground_truth_detection_accuracy():
     )
     assert gt["recall"] == 1.0, f"Recall dropped below 1.0: {gt['recall']}"
 
-    # Incidental violations (the two overlapping shifts from the Case 4 overtime injection)
-    # are correctly classified as False Positives rather than True Positives.
-    assert gt["false_positives"] == 2
-    assert gt["precision"] == 0.7143
-    assert gt["f1_score"] == 0.8333
+    # After fixing the overtime injection to use non-overlapping shift intervals,
+    # there are 0 incidental baseline violations and 0 false positives.
+    assert gt["false_positives"] == 0, (
+        f"Expected 0 false positives but got {gt['false_positives']}: "
+        f"{gt.get('incidental_baseline_violations', [])}"
+    )
+    assert gt["precision"] == 1.0
+    assert gt["f1_score"] == 1.0
     assert "incidental_baseline_violations" in gt
-    assert len(gt["incidental_baseline_violations"]) == 2
+    assert len(gt["incidental_baseline_violations"]) == 0
+
+
+@pytest.mark.parametrize("scale", ["starter", "full"])
+def test_no_unintended_baseline_or_injected_overlaps(scale: str):
+    """
+    Regression test:
+    Verify that across both starter and full scales:
+    1. Normal baseline generation and anomaly injection produce ZERO unintended shift overlaps.
+    2. Exactly 1 double-booking anomaly is detected: the deliberately injected GT-000001.
+    3. Precision, Recall, and F1 are all 100% with 0 false positives and 0 false negatives.
+    """
+    gen = SyntheticDataGenerator(seed=20261022, scale=scale)
+    dataset = gen.generate()
+    validator = DatasetValidator(dataset)
+    report = validator.validate()
+
+    double_bookings = [
+        issue for issue in report.detected_rule_violations
+        if issue.rule_code == "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS"
+    ]
+    # Exactly one double-booking violation must exist: the deliberately injected GT-000001
+    assert len(double_bookings) == 1, (
+        f"Expected exactly 1 double-booking anomaly (GT-000001), but found {len(double_bookings)}: "
+        f"{[d.message for d in double_bookings]}"
+    )
+    assert "SHIFT-2026-01-01-A-000001" in double_bookings[0].message
+    assert "SHIFT-2026-01-01-B-999001" in double_bookings[0].message
+
+    gt = report.ground_truth_evaluation
+    assert gt["true_positives"] == 5
+    assert gt["false_positives"] == 0
+    assert gt["false_negatives"] == 0
+    assert gt["precision"] == 1.0
+    assert gt["recall"] == 1.0
+    assert gt["f1_score"] == 1.0
+    assert len(gt["incidental_baseline_violations"]) == 0
+
 
 
 

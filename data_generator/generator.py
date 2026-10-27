@@ -964,60 +964,95 @@ class SyntheticDataGenerator:
         # ---------------------------------------------------------------------
         # Case 4: Overtime Cap Exceeded
         # Schedule an employee for excessive hours within a single week (> contract + 12h)
+        # without introducing unintended overlapping shifts (which would cause false-positive double bookings).
         # ---------------------------------------------------------------------
         ot_emp = employees[2]
-        ot_d1 = self.start_date + datetime.timedelta(days=7)
-        ot_d2 = self.start_date + datetime.timedelta(days=8)
-        ot_d3 = self.start_date + datetime.timedelta(days=9)
+        shift_templates = self._generate_shift_templates()
 
-        ot_date_1 = ot_d1.isoformat()
-        ot_date_2 = ot_d2.isoformat()
-        ot_date_3 = ot_d3.isoformat()
+        # Track existing shift intervals for ot_emp to strictly prevent concurrent overlaps
+        emp_intervals: List[Tuple[datetime.datetime, datetime.datetime]] = []
+        for a in assignments:
+            if a.employee_id == ot_emp.employee_id and a.status in (
+                AssignmentStatus.SCHEDULED,
+                AssignmentStatus.COMPLETED,
+            ):
+                try:
+                    s_dt = datetime.datetime.fromisoformat(a.scheduled_start.replace("Z", "+00:00"))
+                    e_dt = datetime.datetime.fromisoformat(a.scheduled_end.replace("Z", "+00:00"))
+                    emp_intervals.append((s_dt, e_dt))
+                except (ValueError, TypeError):
+                    pass
 
-        ot_end_1 = (ot_d1 + datetime.timedelta(days=1)).isoformat()
-        ot_end_2 = (ot_d2 + datetime.timedelta(days=1)).isoformat()
-        ot_end_3 = (ot_d3 + datetime.timedelta(days=1)).isoformat()
+        # Approved leaves lookup for ot_emp
+        ot_leave_dates = set()
+        for lr in leave_requests:
+            if lr.employee_id == ot_emp.employee_id and lr.status == LeaveStatus.APPROVED:
+                cur = datetime.date.fromisoformat(lr.start_date)
+                end = datetime.date.fromisoformat(lr.end_date)
+                while cur <= end:
+                    ot_leave_dates.add(cur.isoformat())
+                    cur += datetime.timedelta(days=1)
 
-        ot_asgn_1 = ShiftAssignment(
-            assignment_id=f"SHIFT-{ot_date_1}-C-999003",
-            date=ot_date_1,
-            shift_template_id="TMPL-NGHT",
-            employee_id=ot_emp.employee_id,
-            team_id=ot_emp.team_id,
-            role_skill_id=None,
-            scheduled_start=f"{ot_date_1}T23:00:00Z",
-            scheduled_end=f"{ot_end_1}T07:30:00Z",
-            status=AssignmentStatus.SCHEDULED,
-            created_at="2026-01-01T00:00:00Z",
-            created_by="ANOMALY_INJECTION",
-        )
-        ot_asgn_2 = ShiftAssignment(
-            assignment_id=f"SHIFT-{ot_date_2}-C-999004",
-            date=ot_date_2,
-            shift_template_id="TMPL-NGHT",
-            employee_id=ot_emp.employee_id,
-            team_id=ot_emp.team_id,
-            role_skill_id=None,
-            scheduled_start=f"{ot_date_2}T23:00:00Z",
-            scheduled_end=f"{ot_end_2}T07:30:00Z",
-            status=AssignmentStatus.SCHEDULED,
-            created_at="2026-01-01T00:00:00Z",
-            created_by="ANOMALY_INJECTION",
-        )
-        ot_asgn_3 = ShiftAssignment(
-            assignment_id=f"SHIFT-{ot_date_3}-C-999005",
-            date=ot_date_3,
-            shift_template_id="TMPL-NGHT",
-            employee_id=ot_emp.employee_id,
-            team_id=ot_emp.team_id,
-            role_skill_id=None,
-            scheduled_start=f"{ot_date_3}T23:00:00Z",
-            scheduled_end=f"{ot_end_3}T07:30:00Z",
-            status=AssignmentStatus.SCHEDULED,
-            created_at="2026-01-01T00:00:00Z",
-            created_by="ANOMALY_INJECTION",
-        )
-        assignments.extend([ot_asgn_1, ot_asgn_2, ot_asgn_3])
+        # Select 3 non-overlapping shift slots in Week 2 (ISO week 2) to exceed statutory cap
+        # (3 x 8.0h = +24.0h added to baseline, pushing ot_emp to 56.0h > 52.0h max allowed).
+        selected_slots = []
+        for d_offset in range(self.num_days):
+            cur_d = self.start_date + datetime.timedelta(days=d_offset)
+            if cur_d.isocalendar()[1] != 2:
+                continue
+            cur_d_str = cur_d.isoformat()
+            if cur_d_str in ot_leave_dates:
+                continue
+
+            for tmpl in shift_templates:
+                start_str = f"{cur_d_str}T{tmpl.start_time}:00+00:00"
+                if tmpl.is_overnight:
+                    next_d = cur_d + datetime.timedelta(days=1)
+                    if next_d.isoformat() in ot_leave_dates:
+                        continue
+                    end_str = f"{next_d.isoformat()}T{tmpl.end_time}:00+00:00"
+                else:
+                    end_str = f"{cur_d_str}T{tmpl.end_time}:00+00:00"
+
+                cand_s = datetime.datetime.fromisoformat(start_str)
+                cand_e = datetime.datetime.fromisoformat(end_str)
+
+                # Strictly check half-open interval overlap [start, end)
+                overlap = False
+                for prev_s, prev_e in emp_intervals:
+                    if cand_s < prev_e and prev_s < cand_e:
+                        overlap = True
+                        break
+
+                if not overlap:
+                    emp_intervals.append((cand_s, cand_e))
+                    selected_slots.append((cur_d_str, tmpl, cand_s, cand_e))
+                    if len(selected_slots) == 3:
+                        break
+            if len(selected_slots) == 3:
+                break
+
+        ot_added_asgns = []
+        for i, (d_str, tmpl, s_dt, e_dt) in enumerate(selected_slots):
+            shift_letter = tmpl.shift_code.value if hasattr(tmpl.shift_code, "value") else str(tmpl.shift_code)
+            asgn_id = f"SHIFT-{d_str}-{shift_letter}-{999003 + i}"
+            start_ts = s_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+            end_ts = e_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+            asgn = ShiftAssignment(
+                assignment_id=asgn_id,
+                date=d_str,
+                shift_template_id=tmpl.shift_template_id,
+                employee_id=ot_emp.employee_id,
+                team_id=ot_emp.team_id,
+                role_skill_id=None,
+                scheduled_start=start_ts,
+                scheduled_end=end_ts,
+                status=AssignmentStatus.SCHEDULED,
+                created_at="2026-01-01T00:00:00Z",
+                created_by="ANOMALY_INJECTION",
+            )
+            assignments.append(asgn)
+            ot_added_asgns.append(asgn)
 
         anomalies.append(
             GroundTruthAnomaly(
@@ -1025,7 +1060,7 @@ class SyntheticDataGenerator:
                 anomaly_type=AnomalyType.OVERTIME_CAP_EXCEEDED,
                 entity_type="Employee",
                 primary_entity_id=ot_emp.employee_id,
-                secondary_entity_id=ot_asgn_1.assignment_id,
+                secondary_entity_id=ot_added_asgns[0].assignment_id if ot_added_asgns else None,
                 description=f"Employee {ot_emp.employee_id} exceeded maximum statutory weekly overtime limit (scheduled > 52.0h)",
                 injected_timestamp="2026-01-01T00:00:00Z",
                 severity="HIGH",

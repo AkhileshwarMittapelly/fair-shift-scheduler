@@ -9,11 +9,11 @@
     "lifecycle_transitions": true,
     "duplicate_checks": true,
     "total_issues_logged": 0,
-    "total_anomalies_detected": 7,
+    "total_anomalies_detected": 5,
     "ground_truth_count": 5,
-    "detection_precision": 0.7143,
+    "detection_precision": 1.0,
     "detection_recall": 1.0,
-    "detection_f1_score": 0.8333
+    "detection_f1_score": 1.0
   },
   "structural_integrity": {
     "pk_uniqueness": true,
@@ -31,24 +31,6 @@
       "entity_type": "ShiftAssignment",
       "entity_id": "SHIFT-2026-01-01-A-000001",
       "message": "Employee EMP-000051 has overlapping shifts SHIFT-2026-01-01-A-000001 (2026-01-01T07:00:00Z to 2026-01-01T15:30:00Z) and SHIFT-2026-01-01-B-999001 (2026-01-01T15:00:00Z to 2026-01-01T23:30:00Z)",
-      "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
-      "anomaly_type": "EMPLOYEE_DOUBLE_BOOKED"
-    },
-    {
-      "check_name": "DOUBLE_BOOKING_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "ShiftAssignment",
-      "entity_id": "SHIFT-2026-01-08-C-000312",
-      "message": "Employee EMP-000003 has overlapping shifts SHIFT-2026-01-08-C-000312 (2026-01-08T23:00:00Z to 2026-01-09T07:30:00Z) and SHIFT-2026-01-08-C-999003 (2026-01-08T23:00:00Z to 2026-01-09T07:30:00Z)",
-      "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
-      "anomaly_type": "EMPLOYEE_DOUBLE_BOOKED"
-    },
-    {
-      "check_name": "DOUBLE_BOOKING_DETECTION",
-      "severity": "ANOMALY_DETECTED",
-      "entity_type": "ShiftAssignment",
-      "entity_id": "SHIFT-2026-01-10-B-000401",
-      "message": "Employee EMP-000003 has overlapping shifts SHIFT-2026-01-10-B-000401 (2026-01-10T15:00:00Z to 2026-01-10T23:30:00Z) and SHIFT-2026-01-10-C-999005 (2026-01-10T23:00:00Z to 2026-01-11T07:30:00Z)",
       "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
       "anomaly_type": "EMPLOYEE_DOUBLE_BOOKED"
     },
@@ -92,11 +74,11 @@
   "ground_truth_evaluation": {
     "total_ground_truth": 5,
     "true_positives": 5,
-    "false_positives": 2,
+    "false_positives": 0,
     "false_negatives": 0,
-    "precision": 0.7143,
+    "precision": 1.0,
     "recall": 1.0,
-    "f1_score": 0.8333,
+    "f1_score": 1.0,
     "breakdown": [
       {
         "ground_truth_id": "GT-000001",
@@ -134,20 +116,7 @@
         "matched_on": "SWP-2026-999001"
       }
     ],
-    "incidental_baseline_violations": [
-      {
-        "entity_id": "SHIFT-2026-01-08-C-000312",
-        "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
-        "message": "Employee EMP-000003 has overlapping shifts SHIFT-2026-01-08-C-000312 (2026-01-08T23:00:00Z to 2026-01-09T07:30:00Z) and SHIFT-2026-01-08-C-999003 (2026-01-08T23:00:00Z to 2026-01-09T07:30:00Z)",
-        "classification": "INCIDENTAL_BASELINE_VIOLATION"
-      },
-      {
-        "entity_id": "SHIFT-2026-01-10-B-000401",
-        "rule_code": "RULE_NO_CONCURRENT_OR_OVERLAPPING_SHIFTS",
-        "message": "Employee EMP-000003 has overlapping shifts SHIFT-2026-01-10-B-000401 (2026-01-10T15:00:00Z to 2026-01-10T23:30:00Z) and SHIFT-2026-01-10-C-999005 (2026-01-10T23:00:00Z to 2026-01-11T07:30:00Z)",
-        "classification": "INCIDENTAL_BASELINE_VIOLATION"
-      }
-    ]
+    "incidental_baseline_violations": []
   },
   "detailed_issues": []
 }

@@ -31,7 +31,7 @@
       "size_bytes": 2664103
     },
     "dataset.json": {
-      "sha256": "a010a4ed444362a44ce7c2fb3509f27c33118cd95a962d3d7fbf06cffcef0227",
+      "sha256": "6dc69f25411ed2fad6dfe40938dae314b1fc91c36c143cfedca3424273428f90",
       "size_bytes": 109105857
     },
     "employees.csv": {
@@ -43,11 +43,11 @@
       "size_bytes": 284917
     },
     "ground_truth.csv": {
-      "sha256": "3e99883f2d9dd9b0bf8ab50a4b83195f87d1f5895c009ff938bd19b23eea5998",
+      "sha256": "0ac54adc48d0fe58f1b41fbdcfd349b1219bf0a51ec6154d926af8ed2523da4a",
       "size_bytes": 1313
     },
     "ground_truth.json": {
-      "sha256": "4464093053391d1df2a8d35748178346891d2a4caa58665c08c76256d213c450",
+      "sha256": "c2a69e954abaf1ce070b3e4699dc20e09472effa43b283cc1fafdbebae7a5dff",
       "size_bytes": 2409
     },
     "holiday_calendar.csv": {
@@ -59,7 +59,7 @@
       "size_bytes": 867815
     },
     "scheduler.db": {
-      "sha256": "27ad4bf2fc0e30254891ccce9902b21b9e1f5b364022f00eab7672018f39522c",
+      "sha256": "c8d1dab57c3611732a3acd798a499f7324bb4d34f5f4ca8b7f897fd049e64568",
       "size_bytes": 59240448
     },
     "seed_data.sql": {
@@ -67,7 +67,7 @@
       "size_bytes": 389981
     },
     "shift_assignments.csv": {
-      "sha256": "7486141dd36813ef75e1f9da8d886b3d5a360b357d0ee1dd5fd56ed600bf2c99",
+      "sha256": "bdbb228db19937112ecf635713cbf668dadfc600b9575555fdffc11f015074a8",
       "size_bytes": 12823907
     },
     "shift_templates.csv": {
@@ -87,12 +87,12 @@
       "size_bytes": 12276
     },
     "validation_report.json": {
-      "sha256": "38dcb8e70c9f8f33cbfba02f99dc62952a89c5233608d27004efbc0b904737bb",
-      "size_bytes": 6379
+      "sha256": "8c48afeb44bd3b33b79fa4fda7a45ba4e8185c37304dc0fc0610e11ce52a0dde",
+      "size_bytes": 4502
     },
     "validation_report.md": {
-      "sha256": "84a94a1bee200d8befccc533320122b678fa8ef86103b67142a4b9579c1ff8c8",
-      "size_bytes": 2881
+      "sha256": "5ac36efb87c4e6e346c8acf10ebd4b3ff4bf477a1fb05e82a38cdaaf217f13a2",
+      "size_bytes": 2259
     }
   },
   "validation_summary": {
@@ -104,10 +104,10 @@
     "lifecycle_transitions": true,
     "duplicate_checks": true,
     "total_issues_logged": 0,
-    "total_anomalies_detected": 7,
+    "total_anomalies_detected": 5,
     "ground_truth_count": 5,
-    "detection_precision": 0.7143,
+    "detection_precision": 1.0,
     "detection_recall": 1.0,
-    "detection_f1_score": 0.8333
+    "detection_f1_score": 1.0
   }
 }
