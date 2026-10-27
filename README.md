@@ -129,7 +129,7 @@ python cli.py generate --scale starter --seed 20261022 --out data/starter
 ```bash
 python cli.py generate --scale full --seed 20261022 --out data/full
 ```
-*Generates 81,392 shifts, 162,774 attendance events, and full relational tables.*
+*Generates 81,329 shifts, 162,648 attendance events, and full relational tables.*
 
 ### C. Verify Step 10 Dual-Generation Reproducibility
 ```bash
