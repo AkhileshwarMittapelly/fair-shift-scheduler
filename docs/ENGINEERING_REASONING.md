@@ -17,7 +17,7 @@ Workforce rostering in high-consequence operations (emergency healthcare, critic
 
 | Dimension | Working Assumption | Practical Rationale |
 | :--- | :--- | :--- |
-| **Shift Structure** | 3 non-overlapping 8.0-hour shifts (Morning 07:00–15:30, Afternoon 15:00–23:30, Night 23:00–07:30). | Standard 24/7 tri-shift operational model in healthcare and IT command centers. |
+| **Shift Structure** | 3 non-overlapping 8.0-hour shifts (Morning 07:00–15:30, Afternoon 15:00–23:30, Night 23:00–07:30 with 30m handover). | Standard 24/7 tri-shift operational model in healthcare and IT command centers. |
 | **Overtime Ceilings** | Standard 40h contract + statutory ceiling of 12h overtime per week (52h maximum). | Conforms to US Fair Labor Standards Act (FLSA) and OSHA fatigue guidance. |
 | **Minimum Rest Period** | 11.0 consecutive hours required between shift end and next shift start. | Precludes hazardous back-to-back night-then-morning scheduling ("clopening"). |
 | **Fatigue Window** | Maximum 6 consecutive days before mandatory rest day. | Aligns with standard clinical and mission-critical safety mandates. |
