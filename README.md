@@ -16,7 +16,7 @@ This project strictly adheres to all 4 sections of the **YottaFlex AI Candidate 
 
 | Guideline | Requirement | Project Implementation |
 | :--- | :--- | :--- |
-| **01. Make It Run** | Working, executable code with clear installation, configuration, and verification steps. | Provided automated one-click scripts (`run.bat`, `run.ps1`), 58 passing unit tests, CLI generator, and live web app. |
+| **01. Make It Run** | Working, executable code with clear installation, configuration, and verification steps. | Provided automated one-click scripts (`run.bat`, `run.ps1`), 60 passing unit tests, CLI generator, and live web app. |
 | **02. Show Your Work** | Public GitHub repo with understandable evolution, meaningful commits, and supporting context. | Hosted publicly at [GitHub: AkhileshwarMittapelly/fair-shift-scheduler](https://github.com/AkhileshwarMittapelly/fair-shift-scheduler) with complete Git history. |
 | **03. Use LLMs Transparently** | Prompt history disclosure; explain AI acceleration, heavy reliance, and manual reviews/fixes. | Comprehensive disclosure documented in [docs/AI_DISCLOSURE.md](docs/AI_DISCLOSURE.md). |
 | **04. Make Your Reasoning Visible** | Problem explanation, assumptions, key decisions, trade-offs, testing approach, and proof of work. | Exhaustive architectural reasoning documented in [docs/ENGINEERING_REASONING.md](docs/ENGINEERING_REASONING.md). |
